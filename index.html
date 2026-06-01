@@ -276,6 +276,51 @@ tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
     </div>
     <div class="login-err" id="login-err"></div>
     <button class="btn-login" id="login-btn" onclick="doLogin()">Login</button>
+    <div style="text-align:center;margin-top:14px;">
+      <span style="font-size:12px;color:#94a3b8;">Don't have an account? </span>
+      <button onclick="showRegister()" style="background:none;border:none;color:#2563eb;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Register</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- REGISTER SCREEN -->
+<div class="login-screen" id="register-screen">
+  <div class="login-box" style="width:400px;">
+    <h1>Create Account</h1>
+    <p style="font-size:13px;color:#64748b;text-align:center;margin-bottom:20px;">Your account will be active after manager approval.</p>
+    <div class="login-field">
+      <label>Full Name</label>
+      <input type="text" id="reg-name" placeholder="YOUR FULL NAME..." oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="reg-username" placeholder="YOUR USERNAME..." oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="reg-password" placeholder="Create password..." autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Confirm Password</label>
+      <input type="password" id="reg-confirm" placeholder="Confirm password..." onkeydown="if(event.key==='Enter')doRegister()" autocomplete="off">
+    </div>
+    <div class="login-err" id="reg-err"></div>
+    <button class="btn-login" id="reg-btn" onclick="doRegister()">Submit Registration</button>
+    <div style="text-align:center;margin-top:14px;">
+      <span style="font-size:12px;color:#94a3b8;">Already have an account? </span>
+      <button onclick="showLogin()" style="background:none;border:none;color:#2563eb;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRATION SUCCESS SCREEN -->
+<div class="login-screen" id="reg-success-screen">
+  <div class="login-box" style="text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">✅</div>
+    <h1 style="margin-bottom:10px;">Registration Submitted!</h1>
+    <p style="font-size:13px;color:#64748b;line-height:1.7;margin-bottom:20px;">Your account request has been sent to the manager for approval. You will be able to login once approved.</p>
+    <button class="btn-login" onclick="showLogin()">Back to Login</button>
   </div>
 </div>
 
@@ -294,6 +339,7 @@ tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
       <span class="sync-status sync-loading" id="sync-status">Connecting...</span>
       <span class="candidate-badge" id="header-name">Loading...</span>
       <button class="btn-manager" id="manager-btn" onclick="openManagerModal()">⚙ Manager</button>
+      <button class="btn-manager" id="change-pw-btn" onclick="openChangePwModal()" style="display:none;">🔑 Password</button>
       <button class="btn-manager" onclick="logout()" style="color:#dc2626;border-color:#fecaca;">Logout</button>
     </div>
   </div>
@@ -483,9 +529,19 @@ tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
 
     <!-- LOGINS -->
     <div id="panel-logins">
+      <!-- PENDING REGISTRATIONS -->
+      <div id="pending-reg-section" style="display:none;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:600;color:#d97706;">⏳ Pending Registrations</span>
+          <span id="pending-reg-count" style="background:#fef3c7;color:#d97706;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;"></span>
+        </div>
+        <div id="pending-reg-list"></div>
+      </div>
+      <div style="border-top:1px solid #e2e6ea;padding-top:14px;margin-bottom:10px;" id="approved-section">
       <div class="cand-count-bar">
         <span class="cand-count" id="login-count">0 logins</span>
         <span style="font-size:11px;color:#94a3b8;">Only listed candidates can login</span>
+      </div>
       </div>
       <div class="cand-list" id="login-list"></div>
       <div style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;">
@@ -621,6 +677,32 @@ tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
   </div>
 </div>
 
+
+<!-- CANDIDATE CHANGE PASSWORD MODAL -->
+<div class="modal-overlay" id="candidate-pw-modal" style="display:none;">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2>🔑 Change Password</h2>
+      <button class="btn-cancel" onclick="closeChangePwModal()" style="padding:4px 10px;">✕</button>
+    </div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Your new password will be updated immediately.</p>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;">Current Password</label>
+      <input type="password" id="cand-pw-current" placeholder="Enter current password..." style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;width:100%;outline:none;font-family:Inter,sans-serif;margin-top:4px;">
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;">New Password</label>
+      <input type="password" id="cand-pw-new" placeholder="Enter new password..." style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;width:100%;outline:none;font-family:Inter,sans-serif;margin-top:4px;">
+    </div>
+    <div class="form-group" style="margin-bottom:16px;">
+      <label style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;">Confirm New Password</label>
+      <input type="password" id="cand-pw-confirm" placeholder="Confirm new password..." style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;width:100%;outline:none;font-family:Inter,sans-serif;margin-top:4px;" onkeydown="if(event.key==='Enter')saveCandidatePassword()">
+    </div>
+    <div class="error-msg" id="cand-pw-error"></div>
+    <button class="btn-confirm" id="cand-pw-save-btn" onclick="saveCandidatePassword()" style="width:100%;">Update Password</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -731,6 +813,7 @@ async function doLogin(){
       document.getElementById('app-nav').classList.add('show');
       document.getElementById('f-candidate').value=candidateName;
       document.getElementById('candidate-export-btn').style.display='flex';
+      document.getElementById('change-pw-btn').style.display='flex';
       updateHeaderName();
       showLoading('Loading your data...');
       try{entries=rowsToEntries(await fetchFromSheet());setSyncStatus('ok','✓ Live');hideLoading();renderTable();updateStats();}
@@ -748,6 +831,7 @@ function logout(){
   loggedInUser=null;candidateName='';isManager=false;
   localStorage.removeItem('vct_candidate_name');
   document.getElementById('main-app').style.display='none';
+  document.getElementById('change-pw-btn').style.display='none';
   document.getElementById('app-nav').classList.remove('show');
   document.getElementById('login-screen').classList.add('show');
   document.getElementById('login-username').value='';
@@ -974,7 +1058,7 @@ function exportMyCsv(){
 
 // ===== MANAGER =====
 function openManagerModal(){
-  if(isManager){document.getElementById('manager-panel').style.display='flex';renderLoginList();renderEmailChips();populateExportFilter();updatePWDisplay();return;}
+  if(isManager){document.getElementById('manager-panel').style.display='flex';renderLoginList();renderPendingRegistrations();renderEmailChips();populateExportFilter();updatePWDisplay();return;}
   document.getElementById('manager-modal').style.display='flex';
   document.getElementById('pw-input').value='';document.getElementById('pw-error').style.display='none';
   setTimeout(()=>document.getElementById('pw-input').focus(),100);
@@ -993,7 +1077,7 @@ async function checkPassword(){
     showLoading('Loading all data...');await refreshData();hideLoading();
     populateCandidateFilter();updateHeaderName();showToast('✓ Manager view unlocked');
     document.getElementById('manager-panel').style.display='flex';
-    renderLoginList();renderEmailChips();populateExportFilter();updatePWDisplay();
+    renderLoginList();renderPendingRegistrations();renderEmailChips();populateExportFilter();updatePWDisplay();
   }else{
     document.getElementById('pw-error').style.display='block';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();
   }
@@ -1264,6 +1348,148 @@ function renderManagerApprovals(){
 function approveBooking(id){schBookings.filter(b=>b.id===id).forEach(b=>b.status='confirmed');saveSchBookings();renderScheduler();showToast('✓ Booking approved!');}
 function rejectBooking(id){if(confirm('Reject this booking?')){schBookings=schBookings.filter(b=>b.id!==id);saveSchBookings();renderScheduler();showToast('Booking rejected');}}
 function cancelBooking(id){if(confirm('Cancel this confirmed booking?\n\nThe slot will be freed up for other candidates.')){schBookings=schBookings.filter(b=>b.id!==id);saveSchBookings();renderScheduler();showToast('✓ Booking cancelled — slot is now available');}}
+
+
+
+// ===== REGISTRATION =====
+let pendingRegistrations = JSON.parse(localStorage.getItem('vct_pending_regs') || '[]');
+function savePendingRegs(){localStorage.setItem('vct_pending_regs', JSON.stringify(pendingRegistrations));}
+
+function showRegister(){
+  document.getElementById('login-screen').classList.remove('show');
+  document.getElementById('register-screen').classList.add('show');
+  document.getElementById('reg-name').value='';
+  document.getElementById('reg-username').value='';
+  document.getElementById('reg-password').value='';
+  document.getElementById('reg-confirm').value='';
+  document.getElementById('reg-err').style.display='none';
+}
+
+function showLogin(){
+  document.getElementById('register-screen').classList.remove('show');
+  document.getElementById('reg-success-screen').classList.remove('show');
+  document.getElementById('login-screen').classList.add('show');
+}
+
+async function doRegister(){
+  const name = document.getElementById('reg-name').value.trim().toUpperCase();
+  const username = document.getElementById('reg-username').value.trim().toUpperCase();
+  const password = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-confirm').value;
+  const errEl = document.getElementById('reg-err');
+  const btn = document.getElementById('reg-btn');
+  errEl.style.display='none';
+
+  if(!name){errEl.textContent='Full name is required.';errEl.style.display='block';return;}
+  if(!username){errEl.textContent='Username is required.';errEl.style.display='block';return;}
+  if(!password||password.length<4){errEl.textContent='Password must be at least 4 characters.';errEl.style.display='block';return;}
+  if(password!==confirm){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
+
+  // Load latest credentials to check duplicates
+  btn.disabled=true;btn.textContent='Submitting...';
+  try{
+    await loadCredentialsFromSheet();
+    if(credentials.some(c=>c.username.toUpperCase()===username)){
+      errEl.textContent='Username already taken. Please choose another.';errEl.style.display='block';
+      btn.disabled=false;btn.textContent='Submit Registration';return;
+    }
+    if(pendingRegistrations.some(r=>r.username===username)){
+      errEl.textContent='This username already has a pending request.';errEl.style.display='block';
+      btn.disabled=false;btn.textContent='Submit Registration';return;
+    }
+    pendingRegistrations.push({candidateName:name, username, password, submittedAt:new Date().toISOString()});
+    savePendingRegs();
+    document.getElementById('register-screen').classList.remove('show');
+    document.getElementById('reg-success-screen').classList.add('show');
+  }catch(e){
+    errEl.textContent='Connection error. Please try again.';errEl.style.display='block';
+  }finally{btn.disabled=false;btn.textContent='Submit Registration';}
+}
+
+function renderPendingRegistrations(){
+  const section = document.getElementById('pending-reg-section');
+  const list = document.getElementById('pending-reg-list');
+  const count = document.getElementById('pending-reg-count');
+
+  if(!pendingRegistrations.length){
+    section.style.display='none';return;
+  }
+  section.style.display='block';
+  count.textContent = pendingRegistrations.length + ' pending';
+  list.innerHTML = pendingRegistrations.map((r,i)=>`
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <span style="font-size:13px;font-weight:600;color:#1a1d23;">${r.candidateName}</span>
+        <span style="font-size:11px;color:#94a3b8;font-family:JetBrains Mono,monospace;">@${r.username} · ${'•'.repeat(r.password.length)}</span>
+        <span style="font-size:11px;color:#d97706;">${new Date(r.submittedAt).toLocaleDateString()}</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="approveRegistration(${i})" style="background:#059669;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">✓ Approve</button>
+        <button onclick="rejectRegistration(${i})" style="background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">✕ Reject</button>
+      </div>
+    </div>`).join('');
+}
+
+async function approveRegistration(i){
+  const reg = pendingRegistrations[i];
+  credentials.push({candidateName:reg.candidateName, username:reg.username, password:reg.password});
+  await saveCredentialsToSheet();
+  pendingRegistrations.splice(i,1);
+  savePendingRegs();
+  renderPendingRegistrations();
+  renderLoginList();
+  showToast('✓ '+reg.candidateName+' approved!');
+}
+
+function rejectRegistration(i){
+  const name = pendingRegistrations[i].candidateName;
+  if(confirm('Reject registration for "'+name+'"?')){
+    pendingRegistrations.splice(i,1);
+    savePendingRegs();
+    renderPendingRegistrations();
+    showToast('Registration rejected for '+name);
+  }
+}
+
+// ===== CANDIDATE PASSWORD CHANGE =====
+function openChangePwModal(){
+  document.getElementById('cand-pw-current').value='';
+  document.getElementById('cand-pw-new').value='';
+  document.getElementById('cand-pw-confirm').value='';
+  document.getElementById('cand-pw-error').style.display='none';
+  document.getElementById('candidate-pw-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('cand-pw-current').focus(),100);
+}
+function closeChangePwModal(){document.getElementById('candidate-pw-modal').style.display='none';}
+
+async function saveCandidatePassword(){
+  const current=document.getElementById('cand-pw-current').value;
+  const newPw=document.getElementById('cand-pw-new').value;
+  const confirm=document.getElementById('cand-pw-confirm').value;
+  const errEl=document.getElementById('cand-pw-error');
+  const btn=document.getElementById('cand-pw-save-btn');
+  errEl.style.display='none';
+
+  // Validate current password
+  const user=credentials.find(c=>c.candidateName.toUpperCase()===candidateName.toUpperCase());
+  if(!user){errEl.textContent='Could not find your account.';errEl.style.display='block';return;}
+  if(current!==user.password){errEl.textContent='Current password is incorrect.';errEl.style.display='block';return;}
+  if(!newPw||newPw.length<4){errEl.textContent='New password must be at least 4 characters.';errEl.style.display='block';return;}
+  if(newPw!==confirm){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
+  if(newPw===current){errEl.textContent='New password must be different from current.';errEl.style.display='block';return;}
+
+  btn.disabled=true;btn.textContent='Updating...';
+  // Update in credentials array
+  user.password=newPw;
+  if(loggedInUser)loggedInUser.password=newPw;
+  try{
+    await saveCredentialsToSheet();
+    closeChangePwModal();
+    showToast('✓ Password updated successfully!');
+  }catch(e){
+    errEl.textContent='Failed to save. Please try again.';errEl.style.display='block';
+  }finally{btn.disabled=false;btn.textContent='Update Password';}
+}
 
 // ===== INIT =====
 async function init(){
