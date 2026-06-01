@@ -327,8 +327,8 @@ tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
 <!-- REVOKED SCREEN -->
 <div class="revoked-screen" id="revoked-screen">
   <div class="revoked-icon">🚫</div>
-  <div class="revoked-title">Access Revoked</div>
-  <div class="revoked-msg">Your access has been revoked or your name is not registered. Please contact your manager.</div>
+  <div class="revoked-title">Access Unavailable</div>
+  <div class="revoked-msg">Your access has been removed or is not yet activated. Please contact your admin to restore access.</div>
 </div>
 
 <!-- MAIN APP -->
@@ -753,7 +753,7 @@ async function loadCredentialsFromSheet(){
   try{
     const res=await fetch(SHEET_URL+'?action=getCredentials&t='+Date.now());
     const data=await res.json();
-    if(data.credentials)credentials=data.credentials;
+    if(data.credentials)credentials=data.credentials.map(c=>({...c,username:c.username.toUpperCase(),candidateName:c.candidateName.toUpperCase()}));
     if(data.managerPassword){managerPW=data.managerPassword;localStorage.setItem('vct_manager_pw',managerPW);}
   }catch(e){credentials=JSON.parse(localStorage.getItem('vct_credentials_v1')||'[]');}
 }
@@ -772,7 +772,7 @@ async function refreshData(){
 
 // ===== LOGIN =====
 async function doLogin(){
-  const username=document.getElementById('login-username').value.trim().toLowerCase();
+  const username=document.getElementById('login-username').value.trim().toUpperCase();
   const password=document.getElementById('login-password').value;
   const errEl=document.getElementById('login-err');
   const btn=document.getElementById('login-btn');
@@ -780,7 +780,7 @@ async function doLogin(){
   if(!username||!password){errEl.textContent='Please enter username and password.';errEl.style.display='block';return;}
   btn.disabled=true;btn.textContent='Checking...';
 
-  if(username==='manager'&&password===managerPW){
+  if(username.toUpperCase()==='MANAGER'&&password===managerPW){
     btn.disabled=false;btn.textContent='Login';
     document.getElementById('login-screen').classList.remove('show');
     document.getElementById('main-app').style.display='block';
@@ -803,7 +803,7 @@ async function doLogin(){
 
   try{
     await loadCredentialsFromSheet();
-    const user=credentials.find(c=>c.username.toLowerCase()===username&&c.password===password);
+    const user=credentials.find(c=>c.username.toUpperCase()===username.toUpperCase()&&c.password===password);
     if(user){
       loggedInUser=user;
       candidateName=user.candidateName.toUpperCase();
@@ -1396,11 +1396,11 @@ async function doRegister(){
   btn.disabled=true;btn.textContent='Submitting...';
   try{
     await loadCredentialsFromSheet();
-    if(credentials.some(c=>c.username.toUpperCase()===username)){
+    if(credentials.some(c=>c.username.toUpperCase()===username.toUpperCase())){
       errEl.textContent='Username already taken. Please choose another.';errEl.style.display='block';
       btn.disabled=false;btn.textContent='Submit Registration';return;
     }
-    if(pendingRegistrations.some(r=>r.username===username)){
+    if(pendingRegistrations.some(r=>r.username.toUpperCase()===username.toUpperCase())){
       errEl.textContent='This username already has a pending request.';errEl.style.display='block';
       btn.disabled=false;btn.textContent='Submit Registration';return;
     }
