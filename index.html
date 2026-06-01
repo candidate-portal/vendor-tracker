@@ -753,13 +753,27 @@ async function loadCredentialsFromSheet(){
   try{
     const res=await fetch(SHEET_URL+'?action=getCredentials&t='+Date.now());
     const data=await res.json();
-    if(data.credentials)credentials=data.credentials.map(c=>({...c,username:c.username.toUpperCase(),candidateName:c.candidateName.toUpperCase()}));
+    if(data.credentials){
+    const seen=new Set();
+    credentials=data.credentials
+      .map(c=>({...c,username:c.username.toUpperCase(),candidateName:c.candidateName.toUpperCase()}))
+      .filter(c=>{if(seen.has(c.username))return false;seen.add(c.username);return true;});
+  }
     if(data.managerPassword){managerPW=data.managerPassword;localStorage.setItem('vct_manager_pw',managerPW);}
   }catch(e){credentials=JSON.parse(localStorage.getItem('vct_credentials_v1')||'[]');}
 }
 
 function saveCredentialsLocal(){localStorage.setItem('vct_credentials_v1',JSON.stringify(credentials));}
 async function saveCredentialsToSheet(){
+  // Deduplicate by username before saving
+  const seen = new Set();
+  const deduped = credentials.filter(c => {
+    const key = c.username.toUpperCase();
+    if(seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  credentials = deduped;
   try{await postToSheet({action:'saveCredentials',credentials,managerPassword:managerPW});saveCredentialsLocal();}
   catch(e){saveCredentialsLocal();showToast('Saved locally',true);}
 }
@@ -782,6 +796,7 @@ async function doLogin(){
 
   if(username.toUpperCase()==='MANAGER'&&password===managerPW){
     btn.disabled=false;btn.textContent='Login';
+    localStorage.setItem('vct_is_manager','true');
     document.getElementById('login-screen').classList.remove('show');
     document.getElementById('main-app').style.display='block';
     document.getElementById('app-nav').classList.add('show');
@@ -808,6 +823,7 @@ async function doLogin(){
       loggedInUser=user;
       candidateName=user.candidateName.toUpperCase();
       localStorage.setItem('vct_candidate_name',candidateName);
+      localStorage.setItem('vct_username',user.username.toUpperCase());
       btn.disabled=false;btn.textContent='Login';
       document.getElementById('login-screen').classList.remove('show');
       document.getElementById('main-app').style.display='block';
@@ -831,6 +847,8 @@ async function doLogin(){
 function logout(){
   loggedInUser=null;candidateName='';isManager=false;
   localStorage.removeItem('vct_candidate_name');
+  localStorage.removeItem('vct_username');
+  localStorage.removeItem('vct_is_manager');
   document.getElementById('main-app').style.display='none';
   document.getElementById('change-pw-btn').style.display='none';
   document.getElementById('app-nav').classList.remove('show');
@@ -1501,8 +1519,64 @@ async function saveCandidatePassword(){
 // ===== INIT =====
 async function init(){
   populateDL('f-dl');populateDL('e-dl');
+
+  // Check if session exists
+  const savedName = localStorage.getItem('vct_candidate_name');
+  const savedIsManager = localStorage.getItem('vct_is_manager') === 'true';
+
+  if(savedIsManager){
+    // Restore manager session
+    localStorage.setItem('vct_is_manager','true');
+    document.getElementById('login-screen').classList.remove('show');
+    document.getElementById('main-app').style.display='block';
+    document.getElementById('app-nav').classList.add('show');
+    isManager=true;
+    document.getElementById('manager-banner').style.display='flex';
+    document.getElementById('form-section').style.display='none';
+    document.getElementById('manager-btn').classList.add('active');
+    document.getElementById('th-candidate').style.display='';
+    document.getElementById('filter-candidate').style.display='';
+    showLoading('Loading all data...');
+    try{
+      entries=rowsToEntries(await fetchFromSheet());
+      await loadCredentialsFromSheet();
+      setSyncStatus('ok','✓ Live');hideLoading();
+      populateCandidateFilter();updateHeaderName();renderTable();updateStats();
+    }catch(e){setSyncStatus('err','✗ Offline');hideLoading();}
+    return;
+  }
+
+  if(savedName){
+    // Restore candidate session
+    showLoading('Loading credentials...');
+    try{
+      await loadCredentialsFromSheet();
+      const user=credentials.find(c=>c.username.toUpperCase()===(localStorage.getItem('vct_username')||'').toUpperCase());
+      if(user){
+        loggedInUser=user;
+        candidateName=savedName;
+        document.getElementById('login-screen').classList.remove('show');
+        document.getElementById('main-app').style.display='block';
+        document.getElementById('app-nav').classList.add('show');
+        document.getElementById('f-candidate').value=candidateName;
+        document.getElementById('candidate-export-btn').style.display='flex';
+        document.getElementById('change-pw-btn').style.display='flex';
+        updateHeaderName();
+        entries=rowsToEntries(await fetchFromSheet());
+        setSyncStatus('ok','✓ Live');hideLoading();
+        renderTable();updateStats();
+        return;
+      }
+    }catch(e){hideLoading();}
+    // Clear invalid session
+    localStorage.removeItem('vct_candidate_name');
+    localStorage.removeItem('vct_username');
+  }
+
+  // Show login screen
   document.getElementById('login-screen').classList.add('show');
   document.getElementById('main-app').style.display='none';
+  hideLoading();
 }
 
 init();
