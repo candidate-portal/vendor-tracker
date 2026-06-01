@@ -754,12 +754,13 @@ async function loadCredentialsFromSheet(){
     const res=await fetch(SHEET_URL+'?action=getCredentials&t='+Date.now());
     const data=await res.json();
     if(data.credentials)credentials=data.credentials;
+    if(data.managerPassword){managerPW=data.managerPassword;localStorage.setItem('vct_manager_pw',managerPW);}
   }catch(e){credentials=JSON.parse(localStorage.getItem('vct_credentials_v1')||'[]');}
 }
 
 function saveCredentialsLocal(){localStorage.setItem('vct_credentials_v1',JSON.stringify(credentials));}
 async function saveCredentialsToSheet(){
-  try{await postToSheet({action:'saveCredentials',credentials});saveCredentialsLocal();}
+  try{await postToSheet({action:'saveCredentials',credentials,managerPassword:managerPW});saveCredentialsLocal();}
   catch(e){saveCredentialsLocal();showToast('Saved locally',true);}
 }
 
@@ -1168,14 +1169,20 @@ function removeEmail(i){notifEmails.splice(i,1);localStorage.setItem('vct_emails
 
 // ===== PASSWORD =====
 function updatePWDisplay(){document.getElementById('current-pw-display').textContent=managerPW;}
-function changePassword(){
+async function changePassword(){
   const p1=document.getElementById('new-pw-1').value;const p2=document.getElementById('new-pw-2').value;
   const errEl=document.getElementById('pw-change-error');errEl.style.display='none';
   if(!p1||p1.length<4){errEl.textContent='Minimum 4 characters.';errEl.style.display='block';return;}
   if(p1!==p2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
   managerPW=p1;localStorage.setItem('vct_manager_pw',managerPW);
   document.getElementById('new-pw-1').value='';document.getElementById('new-pw-2').value='';
-  updatePWDisplay();showToast('✓ Password updated!');
+  updatePWDisplay();
+  try{
+    await saveCredentialsToSheet();
+    showToast('✓ Password updated on all devices!');
+  }catch(e){
+    showToast('✓ Password updated locally');
+  }
 }
 
 // ===== EXPORT CSV =====
