@@ -263,7 +263,7 @@ tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
 <body>
 
 <!-- LOGIN SCREEN -->
-<div class="login-screen show" id="login-screen">
+<div class="login-screen" id="login-screen">
   <div class="login-box">
     <h1>Vendor Contact Tracker</h1>
     <div class="login-field">
@@ -495,7 +495,7 @@ tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
 </div>
 
 <!-- LOADING -->
-<div class="loading-overlay" id="loading-overlay">
+<div class="loading-overlay" id="loading-overlay" style="display:flex;">
   <div class="spinner"></div><p id="loading-msg">Connecting to Google Sheets...</p>
 </div>
 
@@ -1573,10 +1573,10 @@ async function init(){
     localStorage.removeItem('vct_username');
   }
 
-  // Show login screen
+  // No session - show login screen
+  hideLoading();
   document.getElementById('login-screen').classList.add('show');
   document.getElementById('main-app').style.display='none';
-  hideLoading();
 }
 
 init();
