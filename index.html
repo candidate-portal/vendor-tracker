@@ -337,8 +337,8 @@ function render(){
   let q='';for(let i=0;i<7;i++){const k=addDays(today,i);q+='<button class="qd'+(k===curDate?' active':'')+'" onclick="gotoDate(\''+k+'\')">'+fmtQuick(k)+'</button>';}
   $('quick').innerHTML=q;
   const occ=buildOcc();
-  $('view-btn').textContent=showAll?'Show 10 AM – 5 PM only':'Show all 24 hours';
-  $('grid-body').innerHTML=TIMES.filter(function(t){return showAll||(t>='10:00'&&t<'17:00');}).map(function(t){
+  $('view-btn').textContent=showAll?'Show 9 AM – 6 PM only':'Show all 24 hours';
+  $('grid-body').innerHTML=TIMES.filter(function(t){return showAll||(t>='09:00'&&t<'18:00');}).map(function(t){
     return '<tr><td class="tcell">'+fmtTime(t)+'</td>'+ROOMS.map(function(r){return '<td>'+cell(curDate,t,r,occ,isMgr)+'</td>';}).join('')+'</tr>';
   }).join('');
   $('mgr-section').style.display=isMgr?'block':'none';
