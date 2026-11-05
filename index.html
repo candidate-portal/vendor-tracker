@@ -36,6 +36,8 @@ button{font-family:inherit;}
 .sync-loading{background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;}
 .btn-ghost{background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;}
 .btn-ghost:hover{background:#f8fafc;color:#1a1d23;}
+.btn-view{background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(124,58,237,.3);}
+.btn-view:hover{background:#6d28d9;}
 .btn-logout{color:#dc2626;border-color:#fecaca;}
 
 /* PAGE */
@@ -154,7 +156,7 @@ button{font-family:inherit;}
       </div>
     </div>
 
-    <div style="margin-bottom:10px"><button class="btn-ghost" id="view-btn" onclick="showAll=!showAll;render()">Show all 24 hours</button></div>
+    <div style="margin-bottom:10px"><button class="btn-view" id="view-btn" onclick="showAll=!showAll;render()">Show all 24 hours</button></div>
     <div class="legend">
       <span class="lg"><i style="background:#059669"></i>Available</span>
       <span class="lg"><i style="background:#d97706"></i>Pending Approval</span>
@@ -339,7 +341,7 @@ function render(){
   const occ=buildOcc();
   let lo='09:00',hi='18:00';
   bookings.forEach(function(b){if(b.date!==curDate||(b.status!=='pending'&&b.status!=='confirmed'))return;const st=slotTimes(b.time,b.duration);if(!st.length)return;const last=st[st.length-1];if(b.time<lo)lo=b.time;if(last>=hi){const i=TIMES.indexOf(last);hi=TIMES[i+1]||'24:00';}});
-  $('view-btn').textContent=showAll?'Show 9 AM – 6 PM only':'Show all 24 hours';
+  $('view-btn').textContent=showAll?'↩ Back to 9 AM – 6 PM':'🕐 Show all 24 hours';
   $('grid-body').innerHTML=TIMES.filter(function(t){return showAll||(t>=lo&&t<hi);}).map(function(t){
     return '<tr><td class="tcell">'+fmtTime(t)+'</td>'+ROOMS.map(function(r){return '<td>'+cell(curDate,t,r,occ,isMgr)+'</td>';}).join('')+'</tr>';
   }).join('');
