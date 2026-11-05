@@ -130,24 +130,14 @@ button{font-family:inherit;}
 </head>
 <body>
 
-<div class="login-screen" id="login-screen">
-  <div class="login-box">
-    <h1>Interview Scheduler</h1>
-    <div class="lf"><label>Username</label><input type="text" id="login-username" placeholder="Enter username..." autocomplete="off" onkeydown="if(event.key==='Enter')$('login-password').focus()"></div>
-    <div class="lf"><label>Password</label><input type="password" id="login-password" placeholder="Enter password..." onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="login-err" id="login-err"></div>
-    <button class="btn-primary" id="login-btn" onclick="doLogin()">Login</button>
-  </div>
-</div>
-
-<div id="main-app" style="display:none;">
+<div id="main-app">
   <div class="header">
     <h1><span class="dot"></span>Interview Scheduler</h1>
     <div class="hright">
       <span class="sync sync-loading" id="sync">Connecting...</span>
-      <span class="badge-user" id="user-badge"></span>
+      <span class="badge-user" id="user-badge" style="display:none">MANAGER</span>
       <button class="btn-ghost" onclick="refresh()">↻ Refresh</button>
-      <button class="btn-ghost btn-logout" onclick="logout()">Logout</button>
+      <button class="btn-ghost" id="mgr-btn" onclick="toggleManager()">🔒 Manager</button>
     </div>
   </div>
 
@@ -208,13 +198,7 @@ button{font-family:inherit;}
       <button class="dur" id="dur-45" onclick="setDur(45)">45 min</button>
       <button class="dur" id="dur-60" onclick="setDur(60)">1 hour</button>
     </div>
-    <div class="fld">
-      <div class="lbl" style="margin:0">Candidate Name</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input type="text" id="b-name" readonly style="flex:1;background:#eff6ff;color:#2563eb;" oninput="this.value=this.value.toUpperCase()">
-        <button class="btn-ghost" id="b-name-btn" onclick="toggleName()" style="white-space:nowrap;padding:9px 12px;">✏️ Edit</button>
-      </div>
-    </div>
+    <div class="fld"><div class="lbl" style="margin:0">Candidate Name <span style="color:#dc2626">*</span></div><input type="text" id="b-name" placeholder="Enter your full name" oninput="this.value=this.value.toUpperCase()"></div>
     <div class="fld">
       <div class="lbl" style="margin:0">Interview Round <span style="color:#dc2626">*</span></div>
       <select id="b-round"></select>
@@ -292,32 +276,13 @@ async function loadBookings(silent){
   }
 }
 
-/* ---------- login / session ---------- */
-function showErr(m){const e=$('login-err');e.textContent=m;e.style.display='block';}
-async function doLogin(){
-  const u=$('login-username').value.trim().toUpperCase();
-  const p=$('login-password').value;
-  $('login-err').style.display='none';
-  if(!u||!p){showErr('Please enter username and password.');return;}
-  const btn=$('login-btn');btn.disabled=true;btn.textContent='Checking...';
-  try{
-    await loadCredentials();
-    if(u==='MANAGER'&&p===managerPW){session={role:'manager'};}
-    else{
-      const c=credentials.find(function(x){return x.username===u&&x.password===p;});
-      if(!c){showErr('Invalid username or password.');$('login-password').value='';return;}
-      session={role:'candidate',username:c.username,name:c.candidateName};
-    }
-    localStorage.setItem('sch_session',JSON.stringify(session));
-    await startApp();
-  }catch(e){showErr('Connection error. Please try again.');}
-  finally{btn.disabled=false;btn.textContent='Login';}
-}
-
+/* ---------- session (no login) ---------- */
+function deviceId(){let d=localStorage.getItem('sch_dev');if(!d){d='D'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,7).toUpperCase();localStorage.setItem('sch_dev',d);}return d;}
 async function startApp(){
-  $('login-screen').classList.remove('show');
   $('main-app').style.display='block';
-  $('user-badge').textContent=session.role==='manager'?'MANAGER':session.name;
+  const mgr=session.role==='manager';
+  $('user-badge').style.display=mgr?'inline-block':'none';
+  $('mgr-btn').textContent=mgr?'Exit Manager':'🔒 Manager';
   curDate=nowEST().date;
   showLoading(true,'Loading bookings...');
   await loadBookings();
@@ -326,13 +291,13 @@ async function startApp(){
   clearInterval(pollTimer);
   pollTimer=setInterval(poll,30000);
 }
-
-function logout(){
-  session=null;bookings=[];clearInterval(pollTimer);
-  localStorage.removeItem('sch_session');
-  $('main-app').style.display='none';
-  $('login-username').value='';$('login-password').value='';$('login-err').style.display='none';
-  $('login-screen').classList.add('show');
+async function toggleManager(){
+  if(session.role==='manager'){sessionStorage.removeItem('sch_mgr');session={role:'candidate',username:deviceId()};return startApp();}
+  const p=prompt('Enter manager password:');
+  if(!p)return;
+  try{await loadCredentials();}catch(e){toast('Connection error',true);return;}
+  if(p===managerPW){sessionStorage.setItem('sch_mgr','1');session={role:'manager'};startApp();}
+  else toast('Wrong password',true);
 }
 
 async function refresh(){setSync('loading','Syncing...');const ok=await loadBookings();if(ok){render();toast('Refreshed');}}
@@ -422,8 +387,7 @@ function fits(date,time,room,dur,occ){
 function openBooking(date,time,room){
   slot={date:date,time:time,room:room};duration=30;
   $('b-info').textContent=room+' · '+fmtTime(time)+' · '+fmtLong(date);
-  const n=$('b-name');n.value=session.name;n.readOnly=true;n.style.background='#eff6ff';n.style.color='#2563eb';
-  $('b-name-btn').textContent='✏️ Edit';
+  $('b-name').value=localStorage.getItem('sch_name')||'';
   $('b-round').innerHTML='<option value="">Select round...</option>'+ROUNDS.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join('');
   $('b-err').style.display='none';
   const occ=buildOcc();
@@ -432,11 +396,6 @@ function openBooking(date,time,room){
 }
 function closeBooking(){$('booking-modal').style.display='none';slot=null;}
 function setDur(d){if($('dur-'+d).disabled)return;duration=d;[30,45,60].forEach(function(x){$('dur-'+x).classList.toggle('active',x===d);});}
-function toggleName(){
-  const n=$('b-name'),b=$('b-name-btn');
-  if(n.readOnly){n.readOnly=false;n.style.background='#fff';n.style.color='#1a1d23';n.focus();b.textContent='✓ Lock';}
-  else{n.readOnly=true;n.style.background='#eff6ff';n.style.color='#2563eb';b.textContent='✏️ Edit';}
-}
 function bErr(m){const e=$('b-err');e.textContent=m;e.style.display='block';}
 
 async function submitBooking(){
@@ -446,7 +405,7 @@ async function submitBooking(){
   if(!round){bErr('Please select an interview round.');return;}
   if(!fits(slot.date,slot.time,slot.room,duration,buildOcc())){bErr('That duration no longer fits. Pick another.');return;}
   submitting=true;const btn=$('b-submit');btn.disabled=true;btn.textContent='Saving...';
-  const b={id:'B'+Date.now()+Math.floor(Math.random()*1000),date:slot.date,time:slot.time,room:slot.room,name:name,round:round,duration:duration,status:'pending',createdBy:session.username};
+  const b={id:'B'+Date.now()+Math.floor(Math.random()*1000),date:slot.date,time:slot.time,room:slot.room,name:name,round:round,duration:duration,status:'pending',createdBy:session.username};localStorage.setItem('sch_name',name);
   try{
     const r=await apiPost(Object.assign({action:'addBooking'},b));
     if(r.status==='ok'){bookings.push(b);closeBooking();render();toast('✓ Request sent — awaiting manager approval');}
@@ -475,27 +434,10 @@ function removeBooking(id,mine,confirmedOne){
 }
 
 /* ---------- init ---------- */
-async function init(){
-  const raw=localStorage.getItem('sch_session');
-  if(raw){
-    let s=null;try{s=JSON.parse(raw);}catch(e){}
-    if(s){
-      try{
-        if(s.role==='manager'){session={role:'manager'};}
-        else{
-          await loadCredentials();
-          const c=credentials.find(function(x){return x.username===s.username;});
-          if(c)session={role:'candidate',username:c.username,name:c.candidateName};
-          else localStorage.removeItem('sch_session');
-        }
-        if(session){await startApp();return;}
-      }catch(e){}
-    }
-  }
-  showLoading(false);
-  $('login-screen').classList.add('show');
-}
-init();
+(async function init(){
+  session=sessionStorage.getItem('sch_mgr')?{role:'manager'}:{role:'candidate',username:deviceId()};
+  await startApp();
+})();
 </script>
 </body>
 </html>
