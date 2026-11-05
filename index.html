@@ -1,1584 +1,500 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vendor Contact Tracker</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<title>Interview Scheduler</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1d23;min-height:100vh;}
+body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f5;color:#1a1d23;min-height:100vh;}
+button{font-family:inherit;}
 
 /* LOGIN */
-.login-screen{display:none;position:fixed;inset:0;background:#f0f2f5;z-index:9999;flex-direction:column;align-items:center;justify-content:center;}
+.login-screen{display:none;position:fixed;inset:0;background:#f0f2f5;z-index:900;align-items:center;justify-content:center;padding:16px;}
 .login-screen.show{display:flex;}
-.login-box{background:#fff;border-radius:12px;padding:40px;width:360px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
-.login-box h1{font-size:20px;font-weight:700;color:#1a1d23;margin-bottom:28px;text-align:center;}
-.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
-.login-field label{font-size:12px;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:.07em;}
-.login-field input{background:#f8fafc;border:1px solid #e2e6ea;border-radius:8px;padding:10px 14px;font-size:13px;color:#1a1d23;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif;}
-.login-field input:focus{border-color:#2563eb;background:#fff;}
+.login-box{background:#fff;border-radius:12px;padding:40px;width:360px;max-width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);}
+.login-box h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:28px;}
+.lf{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.lf label{font-size:12px;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:.07em;}
+.lf input{background:#f8fafc;border:1px solid #e2e6ea;border-radius:8px;padding:10px 14px;font-size:14px;outline:none;font-family:inherit;}
+.lf input:focus{border-color:#2563eb;background:#fff;}
 .login-err{font-size:12px;color:#dc2626;margin-bottom:12px;display:none;text-align:center;font-weight:500;}
-.btn-login{width:100%;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;margin-top:4px;}
-.btn-login:hover{background:#1d4ed8;}
-.btn-login:disabled{opacity:.6;cursor:not-allowed;}
-
-/* REVOKED */
-.revoked-screen{display:none;position:fixed;inset:0;background:#fff;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;}
-.revoked-screen.show{display:flex;}
-.revoked-icon{width:90px;height:90px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;}
-.revoked-title{font-size:24px;font-weight:700;color:#dc2626;}
-.revoked-msg{font-size:14px;color:#64748b;max-width:380px;line-height:1.7;}
+.btn-primary{width:100%;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-primary:hover{background:#1d4ed8;}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;}
 
 /* HEADER */
-.header{background:#fff;border-bottom:1px solid #e2e6ea;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-.header-left{display:flex;align-items:center;gap:10px;}
-.logo-dot{width:8px;height:8px;background:#2563eb;border-radius:50%;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.header h1{font-size:15px;font-weight:600;color:#1a1d23;}
-.header-right{display:flex;align-items:center;gap:8px;}
-.candidate-badge{font-size:12px;color:#2563eb;font-family:'JetBrains Mono',monospace;background:#eff6ff;padding:4px 10px;border-radius:6px;border:1px solid #bfdbfe;font-weight:500;}
-.sync-status{font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:6px;font-weight:500;}
+.header{background:#fff;border-bottom:1px solid #e2e6ea;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.header h1{font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px;}
+.dot{width:8px;height:8px;background:#2563eb;border-radius:50%;}
+.hright{display:flex;align-items:center;gap:8px;}
+.badge-user{font-size:12px;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;padding:4px 10px;border-radius:6px;font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sync{font-size:11px;padding:4px 10px;border-radius:6px;font-weight:600;}
 .sync-ok{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;}
 .sync-err{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
 .sync-loading{background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;}
-.btn-manager{background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;transition:all .2s;}
-.btn-manager:hover{background:#f8fafc;color:#1a1d23;}
-.btn-manager.active{background:#fefce8;color:#ca8a04;border-color:#fde68a;}
+.btn-ghost{background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;}
+.btn-ghost:hover{background:#f8fafc;color:#1a1d23;}
+.btn-logout{color:#dc2626;border-color:#fecaca;}
 
-/* NAV TABS */
-.app-nav{background:#fff;border-bottom:2px solid #e2e6ea;padding:0 24px;display:none;align-items:center;gap:0;}
-.app-nav.show{display:flex;}
-.nav-tab{padding:12px 20px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;}
-.nav-tab:hover{color:#2563eb;}
-.nav-tab.active{color:#2563eb;border-bottom-color:#2563eb;font-weight:600;}
+/* PAGE */
+.page{padding:24px;max-width:1100px;margin:0 auto;}
+.top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;}
+.top h2{font-size:18px;font-weight:700;}
+.top p{font-size:13px;color:#64748b;margin-top:2px;}
+.datenav{display:flex;align-items:center;gap:8px;justify-content:flex-end;}
+.nav-btn{background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:7px 12px;font-size:13px;color:#64748b;cursor:pointer;font-weight:500;}
+.nav-btn:hover{color:#2563eb;border-color:#bfdbfe;}
+.cur-date{background:#1a1d23;color:#fff;border-radius:6px;padding:7px 16px;font-size:13px;font-weight:600;}
+.quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;justify-content:flex-end;}
+.qd{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;}
+.qd:hover{background:#eff6ff;color:#2563eb;border-color:#bfdbfe;}
+.qd.active{background:#1a1d23;color:#fff;border-color:#1a1d23;}
+.legend{display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
+.lg{display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b;font-weight:500;}
+.lg i{width:12px;height:12px;border-radius:3px;display:inline-block;}
 
-/* DATE RIBBON */
-.date-ribbon{background:#fff;border-bottom:1px solid #e2e6ea;padding:10px 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.ribbon-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;white-space:nowrap;margin-right:4px;}
-.qd-btn{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;transition:all .2s;white-space:nowrap;}
-.qd-btn:hover{background:#eff6ff;color:#2563eb;border-color:#bfdbfe;}
-.qd-btn.active{background:#2563eb;color:#fff;border-color:#2563eb;}
-.ribbon-sep{width:1px;height:20px;background:#e2e6ea;margin:0 4px;}
-.date-range-wrap{display:flex;align-items:center;gap:6px;}
-.dr-label{font-size:11px;color:#94a3b8;font-weight:500;white-space:nowrap;}
-.date-input{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:5px 10px;font-size:12px;color:#1a1d23;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .2s;cursor:pointer;}
-.date-input:focus{border-color:#2563eb;background:#fff;}
-.date-sep{color:#cbd5e1;font-size:12px;}
-.btn-clear-dates{background:transparent;border:1px solid #e2e6ea;border-radius:6px;padding:5px 10px;font-size:11px;color:#94a3b8;cursor:pointer;transition:all .2s;}
-.btn-clear-dates:hover{color:#dc2626;border-color:#fca5a5;}
+/* GRID */
+.grid{background:#fff;border-radius:10px;overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.grid table{width:100%;border-collapse:collapse;min-width:520px;}
+.grid th{padding:12px 16px;font-size:13px;font-weight:600;background:#f8fafc;border-bottom:2px solid #e2e6ea;text-align:center;}
+.grid th:first-child{text-align:left;color:#64748b;font-size:12px;}
+.grid td{padding:5px 8px;border-bottom:1px solid #f1f5f9;}
+.tcell{padding:5px 16px!important;font-size:13px;color:#64748b;font-weight:500;white-space:nowrap;width:100px;}
+.slot{width:100%;padding:9px 8px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.slot.available{background:#059669;color:#fff;}
+.slot.available:hover:not(:disabled){background:#047857;}
+.slot.available:disabled{cursor:default;}
+.slot.pending{background:#d97706;color:#fff;cursor:default;}
+.slot.booked{background:#dc2626;color:#fff;cursor:default;}
+.slot.cont{opacity:.75;}
+.slot.past{background:#f1f5f9;color:#cbd5e1;cursor:default;}
 
-/* STATS */
-.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-bottom:1px solid #e2e6ea;}
-.stat{padding:14px 24px;text-align:center;border-right:1px solid #e2e6ea;}
-.stat:last-child{border-right:none;}
-.stat-num{font-size:24px;font-weight:700;color:#2563eb;font-family:'Inter',sans-serif;line-height:1;}
-.stat-label{font-size:11px;color:#94a3b8;margin-top:4px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;}
+/* CARDS */
+.card{background:#fff;border-radius:12px;padding:22px;border:1px solid #e2e6ea;margin-top:20px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.card h3{font-size:16px;font-weight:700;margin-bottom:2px;}
+.card .sub{font-size:13px;color:#64748b;margin-bottom:14px;}
+.empty{text-align:center;padding:22px;color:#94a3b8;font-size:13px;}
+.pend{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.pend .nm{font-size:14px;font-weight:600;}
+.pend .dt{font-size:13px;color:#64748b;display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
+.acts{display:flex;gap:8px;}
+.btn-ok{background:#059669;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-ok:hover{background:#047857;}
+.btn-no{background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-no:hover{background:#fef2f2;}
+.btn-cancel-o{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.07em;padding:8px 12px;border-bottom:2px solid #e2e6ea;white-space:nowrap;}
+.tbl td{padding:12px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:middle;}
+.tbl tr:hover td{background:#f8fafc;}
+.tbl-wrap{overflow-x:auto;}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.pill-room{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;}
+.pill-round{background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe;}
+.pill-pending{background:#fffbeb;color:#d97706;border:1px solid #fde68a;}
+.pill-conf{background:#f0fdf4;color:#059669;border:1px solid #bbf7d0;}
+.mine{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid #f1f5f9;}
+.mine:last-child{border-bottom:none;}
+.mine .l{display:flex;flex-direction:column;gap:3px;}
+.mine .t{font-size:13px;font-weight:600;}
+.mine .d{font-size:12px;color:#64748b;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.hint{font-size:11px;color:#94a3b8;}
 
-/* MANAGER BANNER */
-.manager-banner{background:#fefce8;border-bottom:1px solid #fde68a;padding:9px 24px;display:flex;align-items:center;justify-content:space-between;}
-.manager-banner span{font-size:12px;color:#92400e;font-weight:500;}
-.btn-exit{background:#fff;border:1px solid #fde68a;border-radius:6px;padding:5px 12px;font-size:12px;color:#92400e;cursor:pointer;font-weight:500;}
-.btn-exit:hover{background:#fef3c7;}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:500;padding:16px;}
+.modal{background:#fff;border-radius:12px;padding:26px;width:420px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.15);}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:4px;}
+.modal .info{font-size:13px;color:#64748b;margin-bottom:18px;}
+.lbl{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;}
+.durs{display:flex;gap:8px;margin-bottom:16px;}
+.dur{flex:1;padding:8px;border-radius:6px;border:2px solid #e2e6ea;font-size:12px;font-weight:600;cursor:pointer;background:#f8fafc;color:#64748b;}
+.dur.active{border-color:#2563eb;background:#eff6ff;color:#2563eb;}
+.dur:disabled{opacity:.4;cursor:not-allowed;}
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.fld input,.fld select{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;width:100%;}
+.fld input:focus,.fld select:focus{border-color:#2563eb;background:#fff;}
+.berr{font-size:12px;color:#dc2626;margin-bottom:10px;display:none;font-weight:500;}
+.btn-sec{width:100%;background:#fff;color:#64748b;border:1px solid #e2e6ea;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;margin-top:8px;font-weight:500;}
 
-/* FORM */
-.form-section{background:#fff;border-bottom:1px solid #e2e6ea;padding:16px 24px;}
-.form-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:500;color:#64748b;transition:color .2s;user-select:none;}
-.form-toggle:hover{color:#2563eb;}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:16px;}
-.form-group{display:flex;flex-direction:column;gap:4px;}
-.form-group label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;}
-.form-group input,.form-group select{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:8px 10px;font-size:13px;color:#1a1d23;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;width:100%;text-transform:uppercase;}
-.form-group input:focus,.form-group select:focus{border-color:#2563eb;background:#fff;}
-.form-group input:disabled{color:#2563eb;background:#eff6ff;cursor:not-allowed;border-color:#bfdbfe;text-transform:none;}
-.form-group select option{background:#fff;text-transform:none;}
-.form-actions{display:flex;gap:8px;margin-top:14px;align-items:center;}
-.btn-add{background:#2563eb;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
-.btn-add:hover{background:#1d4ed8;}
-.btn-add:disabled{opacity:.5;cursor:not-allowed;}
-.btn-secondary{background:#fff;color:#64748b;border:1px solid #e2e6ea;border-radius:6px;padding:9px 16px;font-size:13px;cursor:pointer;font-weight:500;}
-
-/* FILTERS */
-.filters{background:#fff;border-bottom:1px solid #e2e6ea;padding:12px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.search-wrap{position:relative;}
-.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:15px;pointer-events:none;}
-.search-box{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:7px 12px 7px 34px;font-size:13px;color:#1a1d23;outline:none;width:220px;transition:all .2s;}
-.search-box:focus{border-color:#2563eb;background:#fff;}
-.filter-select{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:7px 10px;font-size:12px;color:#64748b;outline:none;cursor:pointer;font-weight:500;}
-.filter-select option{background:#fff;}
-.row-count{font-size:12px;color:#94a3b8;margin-left:auto;font-weight:500;}
-.btn-refresh{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:7px 12px;font-size:12px;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:500;}
-.btn-refresh:hover{background:#eff6ff;color:#2563eb;border-color:#bfdbfe;}
-.btn-mydata{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:7px 12px;font-size:12px;color:#16a34a;cursor:pointer;display:flex;align-items:center;gap:4px;font-weight:500;}
-
-/* TABLE */
-.table-wrap{overflow-x:auto;padding:16px 24px 32px;}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:1200px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);}
-thead th{text-align:left;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.07em;padding:10px 12px;background:#f8fafc;border-bottom:2px solid #e2e6ea;white-space:nowrap;}
-tbody tr{border-bottom:1px solid #f1f5f9;transition:background .15s;}
-tbody tr:hover{background:#f8fafc;}
-tbody td{padding:10px 12px;color:#374151;vertical-align:middle;}
-.td-date{font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8;white-space:nowrap;}
-.td-bold{font-weight:600;color:#1a1d23;}
-.td-phone{font-family:'JetBrains Mono',monospace;font-size:12px;color:#2563eb;}
-.td-candidate{font-size:12px;color:#7c3aed;font-weight:600;}
-.badge{display:inline-block;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;white-space:nowrap;}
-.badge-blue{background:#eff6ff;color:#2563eb;}
-.badge-amber{background:#fffbeb;color:#d97706;}
-.badge-red{background:#fef2f2;color:#dc2626;}
-.badge-gray{background:#f8fafc;color:#64748b;}
-.badge-purple{background:#f5f3ff;color:#7c3aed;}
-.status-select{background:transparent;border:none;font-size:11px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;padding:3px 4px;border-radius:4px;font-weight:600;}
-.btn-icon{background:transparent;border:none;color:#cbd5e1;cursor:pointer;font-size:15px;padding:4px;border-radius:4px;transition:color .2s;display:inline-flex;align-items:center;}
-.btn-icon:hover{color:#2563eb;}
-.btn-icon.del:hover{color:#dc2626;}
-.empty-state{text-align:center;padding:60px 20px;color:#94a3b8;background:#fff;}
-.empty-state i{font-size:40px;margin-bottom:12px;display:block;}
-
-/* TOAST */
-.toast{position:fixed;bottom:20px;right:20px;background:#1a1d23;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;transform:translateY(60px);opacity:0;transition:all .3s ease;z-index:9998;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+/* LOADING + TOAST */
+.loading{position:fixed;inset:0;background:rgba(240,242,245,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:950;}
+.spin{width:32px;height:32px;border:3px solid #e2e6ea;border-top-color:#2563eb;border-radius:50%;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading p{font-size:13px;color:#64748b;font-weight:500;}
+.toast{position:fixed;bottom:20px;right:20px;background:#16a34a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;transform:translateY(60px);opacity:0;transition:all .3s;z-index:1000;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.15);}
 .toast.show{transform:translateY(0);opacity:1;}
-.form-hidden{display:none;}
-
-/* MODALS */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(2px);}
-.modal{background:#fff;border-radius:12px;padding:28px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
-.modal h2{font-size:16px;font-weight:600;margin-bottom:6px;}
-.modal p{font-size:13px;color:#64748b;margin-bottom:18px;}
-.modal input{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;color:#1a1d23;outline:none;width:100%;margin-bottom:12px;transition:border-color .2s;font-family:'Inter',sans-serif;}
-.modal input:focus{border-color:#2563eb;background:#fff;}
-.modal-actions{display:flex;gap:8px;}
-.btn-confirm{background:#2563eb;color:#fff;border:none;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;flex:1;}
-.btn-confirm:hover{background:#1d4ed8;}
-.btn-cancel{background:#fff;color:#64748b;border:1px solid #e2e6ea;border-radius:6px;padding:9px 18px;font-size:13px;cursor:pointer;font-weight:500;}
-.error-msg{font-size:12px;color:#dc2626;margin-bottom:10px;display:none;font-weight:500;}
-
-/* MANAGER PANEL TABS */
-.manager-tabs{display:flex;border-bottom:2px solid #e2e6ea;margin-bottom:20px;flex-wrap:wrap;}
-.m-tab{padding:10px 14px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;}
-.m-tab:hover{color:#2563eb;}
-.m-tab.active{color:#2563eb;border-bottom-color:#2563eb;font-weight:600;}
-
-/* LOGINS LIST */
-.cand-list{display:flex;flex-direction:column;gap:5px;max-height:240px;overflow-y:auto;margin-bottom:14px;}
-.cand-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e6ea;}
-.cand-name{font-size:13px;font-weight:500;color:#1a1d23;}
-.btn-remove-cand{background:transparent;border:1px solid #fecaca;border-radius:4px;padding:3px 8px;font-size:11px;color:#dc2626;cursor:pointer;font-weight:500;}
-.btn-remove-cand:hover{background:#fef2f2;}
-.add-cand-wrap{display:flex;gap:8px;margin-bottom:12px;}
-.add-cand-wrap input{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:8px 12px;font-size:13px;color:#1a1d23;outline:none;flex:1;transition:border-color .2s;font-family:'Inter',sans-serif;}
-.add-cand-wrap input:focus{border-color:#2563eb;background:#fff;}
-.cand-count-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.cand-count{font-size:12px;color:#94a3b8;}
-
-/* EMAIL CHIPS */
-.email-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-.email-chip{background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:3px 10px;font-size:12px;color:#2563eb;font-weight:500;display:flex;align-items:center;gap:5px;}
-.email-chip button{background:none;border:none;color:#93c5fd;cursor:pointer;font-size:14px;line-height:1;padding:0;}
-
-/* PASSWORD */
-.pw-section{background:#f8fafc;border:1px solid #e2e6ea;border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px;}
-.pw-section label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;}
-.pw-section input{background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:8px 12px;font-size:13px;color:#1a1d23;outline:none;width:100%;transition:border-color .2s;margin-top:5px;font-family:'Inter',sans-serif;}
-.pw-current{font-size:12px;color:#64748b;margin-bottom:4px;}
-.pw-current span{font-family:'JetBrains Mono',monospace;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;}
-
-/* EDIT MODAL */
-.edit-modal{background:#fff;border-radius:12px;padding:24px;width:680px;max-width:96vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
-.edit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px;}
-.edit-group{display:flex;flex-direction:column;gap:4px;}
-.edit-group label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;}
-.edit-group input,.edit-group select{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:8px 10px;font-size:13px;color:#1a1d23;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;width:100%;text-transform:uppercase;}
-.edit-group input:focus,.edit-group select:focus{border-color:#2563eb;background:#fff;}
-
-/* LOADING */
-.loading-overlay{position:fixed;inset:0;background:rgba(240,242,245,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300;gap:14px;}
-.spinner{width:32px;height:32px;border:3px solid #e2e6ea;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay p{font-size:13px;color:#64748b;font-weight:500;}
-
-/* INTERVIEW SCHEDULER */
-.scheduler-wrap{padding:24px;display:none;}
-.sch-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
-.sch-header h2{font-size:18px;font-weight:700;color:#1a1d23;}
-.sch-header p{font-size:13px;color:#64748b;margin-top:2px;}
-.sch-date-nav{display:flex;align-items:center;gap:8px;}
-.sch-date-btn{background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:7px 12px;font-size:13px;color:#64748b;cursor:pointer;transition:all .2s;font-weight:500;}
-.sch-date-btn:hover{background:#f8fafc;color:#2563eb;border-color:#bfdbfe;}
-.sch-date-current{background:#1a1d23;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:13px;font-weight:600;cursor:default;}
-.sch-quick-dates{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.sch-qd{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;transition:all .2s;}
-.sch-qd:hover{background:#eff6ff;color:#2563eb;border-color:#bfdbfe;}
-.sch-qd.active{background:#1a1d23;color:#fff;border-color:#1a1d23;}
-.sch-legend{display:flex;gap:16px;align-items:center;margin-bottom:16px;}
-.sch-legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#64748b;font-weight:500;}
-.sch-legend-dot{width:12px;height:12px;border-radius:3px;}
-.sch-grid{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);overflow-x:auto;}
-.sch-grid table{width:100%;border-collapse:collapse;min-width:500px;}
-.sch-grid thead th{padding:12px 16px;font-size:13px;font-weight:600;color:#1a1d23;background:#f8fafc;border-bottom:2px solid #e2e6ea;text-align:center;}
-.sch-grid thead th:first-child{text-align:left;color:#64748b;font-size:12px;}
-.sch-grid tbody td{padding:6px 8px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
-.sch-grid tbody td:first-child{padding:6px 16px;font-size:13px;color:#64748b;font-weight:500;white-space:nowrap;width:100px;}
-.sch-slot{width:100%;padding:10px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;}
-.sch-slot.available{background:#059669;color:#fff;}
-.sch-slot.available:hover{background:#047857;transform:scale(1.01);}
-.sch-slot.pending{background:#d97706;color:#fff;cursor:default;}
-.sch-slot.booked{background:#dc2626;color:#fff;cursor:default;}
-.sch-modal{background:#fff;border-radius:12px;padding:28px;width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
-.sch-modal h3{font-size:16px;font-weight:600;margin-bottom:4px;color:#1a1d23;}
-.sch-modal .sch-modal-info{font-size:13px;color:#64748b;margin-bottom:20px;}
-.sch-duration-btns{display:flex;gap:8px;margin-bottom:16px;}
-.sch-dur-btn{flex:1;padding:8px;border-radius:6px;border:2px solid #e2e6ea;font-size:12px;font-weight:600;cursor:pointer;background:#f8fafc;color:#64748b;font-family:'Inter',sans-serif;transition:all .2s;}
-.sch-dur-btn.active{border-color:#2563eb;background:#eff6ff;color:#2563eb;}
-.sch-dur-btn:disabled{opacity:.4;cursor:not-allowed;}
-.sch-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-.sch-field label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;}
-.sch-field input,.sch-field select{background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;color:#1a1d23;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif;width:100%;}
-.sch-field input:focus,.sch-field select:focus{border-color:#2563eb;background:#fff;}
-.sch-book-btn{width:100%;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;}
-.sch-book-btn:hover{background:#1d4ed8;}
-.sch-mgr-section{margin-top:24px;}
-.sch-mgr-card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e6ea;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
-.sch-mgr-card-title{font-size:16px;font-weight:700;color:#1a1d23;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.sch-mgr-card-sub{font-size:13px;color:#64748b;margin-bottom:16px;}
-.sch-pending-item{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.sch-pending-item-info{display:flex;flex-direction:column;gap:4px;}
-.sch-pending-name{font-size:14px;font-weight:600;color:#1a1d23;}
-.sch-pending-detail{font-size:13px;color:#64748b;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.sch-pending-actions{display:flex;gap:8px;}
-.sch-confirmed-table{width:100%;border-collapse:collapse;}
-.sch-confirmed-table th{text-align:left;font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.07em;padding:8px 12px;border-bottom:2px solid #e2e6ea;}
-.sch-confirmed-table td{padding:12px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#374151;vertical-align:middle;}
-.sch-confirmed-table tr:hover td{background:#f8fafc;}
-.sch-confirmed-table .td-name{font-weight:600;color:#1a1d23;}
-.sch-room-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;}
-.btn-approve{background:#059669;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
-.btn-approve:hover{background:#047857;}
-.btn-reject{background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
-.btn-reject:hover{background:#fef2f2;}
-.sch-empty{text-align:center;padding:30px;color:#94a3b8;font-size:13px;}
+@media(max-width:600px){.header{padding:0 12px}.page{padding:14px}.datenav,.quick{justify-content:flex-start}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
-    <h1>Vendor Contact Tracker</h1>
-    <div class="login-field">
-      <label>Username</label>
-      <input type="text" id="login-username" placeholder="Enter username..." onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()" autocomplete="off">
-    </div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" id="login-password" placeholder="Enter password..." onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
+    <h1>Interview Scheduler</h1>
+    <div class="lf"><label>Username</label><input type="text" id="login-username" placeholder="Enter username..." autocomplete="off" onkeydown="if(event.key==='Enter')$('login-password').focus()"></div>
+    <div class="lf"><label>Password</label><input type="password" id="login-password" placeholder="Enter password..." onkeydown="if(event.key==='Enter')doLogin()"></div>
     <div class="login-err" id="login-err"></div>
-    <button class="btn-login" id="login-btn" onclick="doLogin()">Login</button>
-    <div style="text-align:center;margin-top:14px;">
-      <span style="font-size:12px;color:#94a3b8;">Don't have an account? </span>
-      <button onclick="showRegister()" style="background:none;border:none;color:#2563eb;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Register</button>
-    </div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Login</button>
   </div>
 </div>
 
-
-<!-- REGISTER SCREEN -->
-<div class="login-screen" id="register-screen">
-  <div class="login-box" style="width:400px;">
-    <h1>Create Account</h1>
-    <p style="font-size:13px;color:#64748b;text-align:center;margin-bottom:20px;">Your account will be active after manager approval.</p>
-    <div class="login-field">
-      <label>Full Name</label>
-      <input type="text" id="reg-name" placeholder="YOUR FULL NAME..." oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;" autocomplete="off">
-    </div>
-    <div class="login-field">
-      <label>Username</label>
-      <input type="text" id="reg-username" placeholder="YOUR USERNAME..." oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;" autocomplete="off">
-    </div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" id="reg-password" placeholder="Create password..." autocomplete="off">
-    </div>
-    <div class="login-field">
-      <label>Confirm Password</label>
-      <input type="password" id="reg-confirm" placeholder="Confirm password..." onkeydown="if(event.key==='Enter')doRegister()" autocomplete="off">
-    </div>
-    <div class="login-err" id="reg-err"></div>
-    <button class="btn-login" id="reg-btn" onclick="doRegister()">Submit Registration</button>
-    <div style="text-align:center;margin-top:14px;">
-      <span style="font-size:12px;color:#94a3b8;">Already have an account? </span>
-      <button onclick="showLogin()" style="background:none;border:none;color:#2563eb;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Login</button>
-    </div>
-  </div>
-</div>
-
-<!-- REGISTRATION SUCCESS SCREEN -->
-<div class="login-screen" id="reg-success-screen">
-  <div class="login-box" style="text-align:center;">
-    <div style="font-size:48px;margin-bottom:16px;">✅</div>
-    <h1 style="margin-bottom:10px;">Registration Submitted!</h1>
-    <p style="font-size:13px;color:#64748b;line-height:1.7;margin-bottom:20px;">Your account request has been sent to the manager for approval. You will be able to login once approved.</p>
-    <button class="btn-login" onclick="showLogin()">Back to Login</button>
-  </div>
-</div>
-
-<!-- REVOKED SCREEN -->
-<div class="revoked-screen" id="revoked-screen">
-  <div class="revoked-icon">🚫</div>
-  <div class="revoked-title">Access Unavailable</div>
-  <div class="revoked-msg">Your access has been removed or is not yet activated. Please contact your admin to restore access.</div>
-</div>
-
-<!-- MAIN APP -->
 <div id="main-app" style="display:none;">
   <div class="header">
-    <div class="header-left"><div class="logo-dot"></div><h1>Vendor Contact Tracker</h1></div>
-    <div class="header-right">
-      <span class="sync-status sync-loading" id="sync-status">Connecting...</span>
-      <span class="candidate-badge" id="header-name">Loading...</span>
-      <button class="btn-manager" id="manager-btn" onclick="openManagerModal()">⚙ Manager</button>
-      <button class="btn-manager" id="change-pw-btn" onclick="openChangePwModal()" style="display:none;">🔑 Password</button>
-      <button class="btn-manager" onclick="logout()" style="color:#dc2626;border-color:#fecaca;">Logout</button>
+    <h1><span class="dot"></span>Interview Scheduler</h1>
+    <div class="hright">
+      <span class="sync sync-loading" id="sync">Connecting...</span>
+      <span class="badge-user" id="user-badge"></span>
+      <button class="btn-ghost" onclick="refresh()">↻ Refresh</button>
+      <button class="btn-ghost btn-logout" onclick="logout()">Logout</button>
     </div>
   </div>
 
-  <!-- NAV TABS -->
-  <div class="app-nav" id="app-nav">
-    <div class="nav-tab active" id="nav-tracker" onclick="switchAppTab('tracker')">📋 Vendor Tracker</div>
-    <div class="nav-tab" id="nav-scheduler" onclick="switchAppTab('scheduler')">📅 Interview Scheduler</div>
-  </div>
-
-  <!-- VENDOR TRACKER SECTION -->
-  <div id="tracker-content">
-    <div class="date-ribbon">
-      <span class="ribbon-label">Filter by:</span>
-      <button class="qd-btn" id="qd-today" onclick="setQuick('today')">Today</button>
-      <button class="qd-btn" id="qd-week" onclick="setQuick('week')">This Week</button>
-      <button class="qd-btn" id="qd-month" onclick="setQuick('month')">This Month</button>
-      <button class="qd-btn" id="qd-last30" onclick="setQuick('last30')">Last 30 Days</button>
-      <div class="ribbon-sep"></div>
-      <div class="date-range-wrap">
-        <span class="dr-label">From</span>
-        <input type="date" class="date-input" id="filter-date-from" onchange="clearQuick();renderTable();">
-        <span class="date-sep">→</span>
-        <span class="dr-label">To</span>
-        <input type="date" class="date-input" id="filter-date-to" onchange="clearQuick();renderTable();">
-        <button class="btn-clear-dates" onclick="clearDates()">✕ Clear</button>
-      </div>
-    </div>
-
-    <div id="manager-banner" style="display:none;" class="manager-banner">
-      <span>⚡ Manager View — all candidates, live from Google Sheets</span>
-      <button class="btn-exit" onclick="exitManagerView()">Exit Manager View</button>
-    </div>
-
-    <div class="stats-bar" id="stats-bar">
-      <div class="stat"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total Contacts</div></div>
-      <div class="stat"><div class="stat-num" id="stat-interviews">0</div><div class="stat-label">Interviews</div></div>
-      <div class="stat"><div class="stat-num" id="stat-pending">0</div><div class="stat-label">Pending</div></div>
-      <div class="stat"><div class="stat-num" id="stat-thisweek">0</div><div class="stat-label">This Week</div></div>
-    </div>
-
-    <div class="form-section" id="form-section">
-      <div class="form-toggle" onclick="toggleForm()">
-        <i class="ti ti-plus" id="toggle-icon"></i>
-        <span id="toggle-label">Log new vendor contact</span>
-      </div>
-      <div id="entry-form" class="form-hidden">
-        <div class="form-grid">
-          <div class="form-group"><label>Candidate Name</label><input type="text" id="f-candidate" disabled></div>
-          <div class="form-group"><label>Date</label><input type="date" id="f-date" style="text-transform:none;"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Vendor Name</label><input type="text" id="f-vendor" placeholder="RECRUITER / VENDOR NAME"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Vendor Phone Number</label><input type="tel" id="f-phone" placeholder="VENDOR'S PHONE" style="text-transform:none;"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Vendor Email <span style="color:#cbd5e1;font-size:10px;">(optional)</span></label><input type="email" id="f-vendor-email" placeholder="VENDOR'S EMAIL" style="text-transform:none;"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Vendor Company</label><input type="text" id="f-vendor-company" placeholder="VENDOR'S COMPANY NAME"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Implementation Partner <span style="color:#cbd5e1;font-size:10px;">(optional)</span></label><input type="text" id="f-impl-partner" placeholder="E.G. WIPRO, COGNIZANT..."></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Client <span style="color:#cbd5e1;font-size:10px;">(optional)</span></label><input type="text" id="f-client" placeholder="END CLIENT NAME"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Position / Role</label><input type="text" id="f-position" placeholder="E.G. SENIOR DATA ENGINEER"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Location Requested</label><input type="text" id="f-location" placeholder="CITY, STATE OR REMOTE"></div>
-          <div class="form-group"><label>DL Submitted (State)</label><select id="f-dl" style="text-transform:none;"></select></div>
-          <div class="form-group"><label>India Team RM</label><input type="text" id="f-india" placeholder="INDIA POC NAME"></div>
-          <div class="form-group"><label>My Location</label><input type="text" id="f-mylocation" placeholder="WHERE YOU ARE"></div>
-          <div class="form-group" style="grid-column:span 2;"><label>Status</label>
-            <select id="f-update" style="text-transform:none;">
-              <option value="">Select status</option>
-              <option>Documents Sent</option><option>Submitted</option>
-              <option>Interview Scheduled</option><option>Interview Done</option>
-              <option>Awaiting Feedback</option><option>Rejected</option>
-              <option>On Hold</option><option>No Response</option>
-            </select>
-          </div>
-          <div class="form-group" style="grid-column:span 4;"><label>Comments</label><input type="text" id="f-comments" placeholder="ANY ADDITIONAL NOTES..."></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn-add" id="save-btn" onclick="addEntry()"><i class="ti ti-device-floppy"></i> Submit</button>
-          <button class="btn-secondary" onclick="clearForm()">Clear</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="filters">
-      <div class="search-wrap">
-        <i class="ti ti-search"></i>
-        <input class="search-box" type="text" placeholder="Search client, vendor, status, location..." oninput="renderTable()" id="search-input">
-      </div>
-      <select class="filter-select" id="filter-status" onchange="renderTable()">
-        <option value="">All statuses</option>
-        <option>Documents Sent</option><option>Submitted</option>
-        <option>Interview Scheduled</option><option>Interview Done</option>
-        <option>Awaiting Feedback</option><option>Rejected</option>
-        <option>On Hold</option><option>No Response</option>
-      </select>
-      <select class="filter-select" id="filter-candidate" onchange="renderTable()" style="display:none;"><option value="">All candidates</option></select>
-      <button class="btn-refresh" onclick="refreshData()"><i class="ti ti-refresh"></i> Refresh</button>
-      <button class="btn-mydata" id="candidate-export-btn" onclick="exportMyCsv()" style="display:none;"><i class="ti ti-download"></i> My Data</button>
-      <span class="row-count" id="row-count"></span>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th><th id="th-candidate" style="display:none;">Candidate</th>
-            <th>Vendor Name</th><th>Vendor Phone</th><th>Vendor Email</th><th>Vendor Company</th>
-            <th>Impl. Partner</th><th>Client</th><th>Position</th><th>Location</th>
-            <th>DL State</th><th>India Team RM</th><th>My Location</th><th>Status</th><th>Comments</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>
-      <div id="empty-state" class="empty-state" style="display:none;">
-        <i class="ti ti-inbox"></i><p id="empty-msg">No entries found.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- INTERVIEW SCHEDULER SECTION -->
-  <div class="scheduler-wrap" id="scheduler-section">
-    <div class="sch-header">
+  <div class="page">
+    <div class="top">
       <div><h2>Schedule Your Interview</h2><p>Select an available time slot. All times are in EST.</p></div>
       <div>
-        <div class="sch-date-nav">
-          <button class="sch-date-btn" onclick="schPrevDay()">‹</button>
-          <span class="sch-date-current" id="sch-date-display"></span>
-          <button class="sch-date-btn" onclick="schNextDay()">›</button>
+        <div class="datenav">
+          <button class="nav-btn" onclick="shiftDay(-1)">‹</button>
+          <span class="cur-date" id="date-display"></span>
+          <button class="nav-btn" onclick="shiftDay(1)">›</button>
         </div>
-        <div class="sch-quick-dates" id="sch-quick-dates"></div>
+        <div class="quick" id="quick"></div>
       </div>
     </div>
-    <div class="sch-legend">
-      <div class="sch-legend-item"><div class="sch-legend-dot" style="background:#059669;"></div>Available</div>
-      <div class="sch-legend-item"><div class="sch-legend-dot" style="background:#d97706;"></div>Pending Approval</div>
-      <div class="sch-legend-item"><div class="sch-legend-dot" style="background:#dc2626;"></div>Booked</div>
+
+    <div class="legend">
+      <span class="lg"><i style="background:#059669"></i>Available</span>
+      <span class="lg"><i style="background:#d97706"></i>Pending Approval</span>
+      <span class="lg"><i style="background:#dc2626"></i>Booked</span>
     </div>
-    <div class="sch-grid">
+
+    <div class="grid">
       <table>
         <thead><tr><th>Time (EST)</th><th>Room 1</th><th>Room 2</th></tr></thead>
-        <tbody id="sch-table-body"></tbody>
+        <tbody id="grid-body"></tbody>
       </table>
     </div>
-    <div class="sch-mgr-section" id="sch-mgr-section" style="display:none;">
-      <div class="sch-mgr-card">
-        <div class="sch-mgr-card-title">🟡 Pending Approvals</div>
-        <div class="sch-mgr-card-sub" id="pending-count"></div>
+
+    <div class="card" id="my-section" style="display:none;">
+      <h3>My Bookings</h3>
+      <div class="sub" id="my-sub"></div>
+      <div id="my-list"></div>
+    </div>
+
+    <div id="mgr-section" style="display:none;">
+      <div class="card">
+        <h3>🟡 Pending Approvals</h3>
+        <div class="sub" id="pending-sub"></div>
         <div id="pending-list"></div>
       </div>
-      <div class="sch-mgr-card">
-        <div class="sch-mgr-card-title">🟢 Confirmed Interviews (This Week)</div>
-        <div class="sch-mgr-card-sub" id="confirmed-count"></div>
+      <div class="card">
+        <h3>🟢 Confirmed Interviews (This Week)</h3>
+        <div class="sub" id="confirmed-sub"></div>
         <div id="confirmed-list"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- LOADING -->
-<div class="loading-overlay" id="loading-overlay" style="display:flex;">
-  <div class="spinner"></div><p id="loading-msg">Connecting to Google Sheets...</p>
-</div>
-
-<!-- MANAGER LOGIN MODAL -->
-<div class="modal-overlay" id="manager-modal" style="display:none;">
+<div class="overlay" id="booking-modal">
   <div class="modal">
-    <h2>⚙ Manager Access</h2>
-    <p>Enter password to unlock manager features.</p>
-    <div class="error-msg" id="pw-error">Incorrect password. Try again.</div>
-    <input type="password" id="pw-input" placeholder="Password..." onkeydown="if(event.key==='Enter')checkPassword()">
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeManagerModal()">Cancel</button>
-      <button class="btn-confirm" onclick="checkPassword()">Unlock</button>
-    </div>
-  </div>
-</div>
-
-<!-- MANAGER PANEL -->
-<div class="modal-overlay" id="manager-panel" style="display:none;">
-  <div class="modal" style="width:560px;max-width:96vw;max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <h2>⚙ Manager Panel</h2>
-      <button class="btn-cancel" onclick="closeManagerPanel()" style="padding:4px 10px;">✕</button>
-    </div>
-    <div class="manager-tabs">
-      <div class="m-tab active" onclick="switchMgrTab('logins')" id="tab-logins">👥 Logins</div>
-      <div class="m-tab" onclick="switchMgrTab('emails')" id="tab-emails">Email Alerts</div>
-      <div class="m-tab" onclick="switchMgrTab('export')" id="tab-export">Export CSV</div>
-      <div class="m-tab" onclick="switchMgrTab('password')" id="tab-password">🔑 Password</div>
-    </div>
-
-    <!-- LOGINS -->
-    <div id="panel-logins">
-      <!-- PENDING REGISTRATIONS -->
-      <div id="pending-reg-section" style="display:none;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-          <span style="font-size:13px;font-weight:600;color:#d97706;">⏳ Pending Registrations</span>
-          <span id="pending-reg-count" style="background:#fef3c7;color:#d97706;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;"></span>
-        </div>
-        <div id="pending-reg-list"></div>
-      </div>
-      <div style="border-top:1px solid #e2e6ea;padding-top:14px;margin-bottom:10px;" id="approved-section">
-      <div class="cand-count-bar">
-        <span class="cand-count" id="login-count">0 logins</span>
-        <span style="font-size:11px;color:#94a3b8;">Only listed candidates can login</span>
-      </div>
-      </div>
-      <div class="cand-list" id="login-list"></div>
-      <div style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;">
-        <p style="font-size:12px;color:#64748b;font-weight:500;">Add New Login</p>
-        <div class="form-group"><label>Candidate Full Name</label><input type="text" id="new-login-name" placeholder="FULL NAME" style="text-transform:uppercase;background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:8px 12px;font-size:13px;outline:none;width:100%;font-family:Inter,sans-serif;"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <div class="form-group"><label>Username</label><input type="text" id="new-login-username" placeholder="e.g. john.smith" style="background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:8px 12px;font-size:13px;outline:none;width:100%;font-family:Inter,sans-serif;text-transform:none;"></div>
-          <div class="form-group"><label>Password</label><input type="text" id="new-login-password" placeholder="e.g. Arc@1234" style="background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:8px 12px;font-size:13px;outline:none;width:100%;font-family:Inter,sans-serif;text-transform:none;"></div>
-        </div>
-        <button class="btn-confirm" onclick="addLogin()" style="width:100%;">+ Add Login</button>
-      </div>
-    </div>
-
-    <!-- EMAILS -->
-    <div id="panel-emails" style="display:none;">
-      <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Notify these emails when a new entry is logged.</p>
-      <div class="email-chips" id="email-chips"></div>
-      <div class="add-cand-wrap">
-        <input type="email" id="new-email-input" placeholder="email@example.com" onkeydown="if(event.key==='Enter')addEmail()">
-        <button class="btn-confirm" onclick="addEmail()" style="white-space:nowrap;padding:8px 14px;">+ Add</button>
-      </div>
-      <div style="margin-top:16px;padding:12px;background:#fffbeb;border-radius:8px;border:1px solid #fde68a;">
-        <p style="font-size:12px;color:#92400e;font-weight:500;">📧 Add this inside doPost() in Apps Script to activate:</p>
-        <pre id="email-script-preview" style="font-size:11px;color:#78350f;margin-top:8px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;line-height:1.5;"></pre>
-      </div>
-    </div>
-
-    <!-- EXPORT -->
-    <div id="panel-export" style="display:none;">
-      <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Download all entries as a CSV file.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div class="form-group"><label>Filter by Candidate</label><select id="export-filter-candidate" class="filter-select" style="width:100%;"></select></div>
-        <div class="form-group"><label>Filter by Status</label>
-          <select id="export-filter-status" class="filter-select" style="width:100%;">
-            <option value="">All statuses</option>
-            <option>Documents Sent</option><option>Submitted</option><option>Interview Scheduled</option>
-            <option>Interview Done</option><option>Awaiting Feedback</option><option>Rejected</option>
-            <option>On Hold</option><option>No Response</option>
-          </select>
-        </div>
-        <button class="btn-add" onclick="exportCSV()" style="width:100%;justify-content:center;"><i class="ti ti-download"></i> Download CSV</button>
-      </div>
-    </div>
-
-    <!-- PASSWORD -->
-    <div id="panel-password" style="display:none;">
-      <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Change the manager password.</p>
-      <div class="pw-section">
-        <div class="pw-current">Current password: <span id="current-pw-display"></span></div>
-        <div><label>New Password</label><input type="password" id="new-pw-1" placeholder="Enter new password..."></div>
-        <div><label>Confirm New Password</label><input type="password" id="new-pw-2" placeholder="Confirm new password..." onkeydown="if(event.key==='Enter')changePassword()"></div>
-        <div class="error-msg" id="pw-change-error"></div>
-        <button class="btn-confirm" onclick="changePassword()">Update Password</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT MODAL -->
-<div class="modal-overlay" id="edit-modal" style="display:none;">
-  <div class="edit-modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-      <h2>✏️ Edit Entry</h2>
-      <button class="btn-cancel" onclick="closeEditModal()" style="padding:4px 10px;">✕</button>
-    </div>
-    <p style="font-size:13px;color:#64748b;">Update any fields and save back to Google Sheets.</p>
-    <div class="edit-grid">
-      <div class="edit-group"><label>Date</label><input type="date" id="e-date" style="text-transform:none;"></div>
-      <div class="edit-group"><label>Vendor Name</label><input type="text" id="e-vendor"></div>
-      <div class="edit-group"><label>Vendor Phone</label><input type="tel" id="e-phone" style="text-transform:none;"></div>
-      <div class="edit-group"><label>Vendor Email</label><input type="email" id="e-vendor-email" style="text-transform:none;"></div>
-      <div class="edit-group"><label>Vendor Company</label><input type="text" id="e-vendor-company"></div>
-      <div class="edit-group"><label>Implementation Partner</label><input type="text" id="e-impl-partner"></div>
-      <div class="edit-group"><label>Client</label><input type="text" id="e-client"></div>
-      <div class="edit-group"><label>Position / Role</label><input type="text" id="e-position"></div>
-      <div class="edit-group"><label>Location Requested</label><input type="text" id="e-location"></div>
-      <div class="edit-group"><label>DL Submitted (State)</label><select id="e-dl" style="text-transform:none;"></select></div>
-      <div class="edit-group"><label>India Team RM</label><input type="text" id="e-india"></div>
-      <div class="edit-group"><label>My Location</label><input type="text" id="e-mylocation"></div>
-      <div class="edit-group"><label>Status</label>
-        <select id="e-update" style="text-transform:none;">
-          <option value="">Select status</option>
-          <option>Documents Sent</option><option>Submitted</option>
-          <option>Interview Scheduled</option><option>Interview Done</option>
-          <option>Awaiting Feedback</option><option>Rejected</option>
-          <option>On Hold</option><option>No Response</option>
-        </select>
-      </div>
-      <div class="edit-group" style="grid-column:span 2;"><label>Comments</label><input type="text" id="e-comments"></div>
-    </div>
-    <div class="form-actions" style="margin-top:16px;">
-      <button class="btn-add" id="edit-save-btn" onclick="saveEditEntry()"><i class="ti ti-device-floppy"></i> Save Changes</button>
-      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- BOOKING MODAL -->
-<div class="modal-overlay" id="sch-booking-modal" style="display:none;">
-  <div class="sch-modal">
     <h3>Book Interview Slot</h3>
-    <p class="sch-modal-info" id="sch-modal-info"></p>
-    <div style="margin-bottom:14px;">
-      <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">Duration</div>
-      <div class="sch-duration-btns">
-        <button class="sch-dur-btn active" onclick="setDuration(30)" id="dur-30">30 min</button>
-        <button class="sch-dur-btn" onclick="setDuration(45)" id="dur-45">45 min</button>
-        <button class="sch-dur-btn" onclick="setDuration(60)" id="dur-60">1 hour</button>
+    <p class="info" id="b-info"></p>
+    <div class="lbl">Duration</div>
+    <div class="durs">
+      <button class="dur active" id="dur-30" onclick="setDur(30)">30 min</button>
+      <button class="dur" id="dur-45" onclick="setDur(45)">45 min</button>
+      <button class="dur" id="dur-60" onclick="setDur(60)">1 hour</button>
+    </div>
+    <div class="fld">
+      <div class="lbl" style="margin:0">Candidate Name</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="b-name" readonly style="flex:1;background:#eff6ff;color:#2563eb;" oninput="this.value=this.value.toUpperCase()">
+        <button class="btn-ghost" id="b-name-btn" onclick="toggleName()" style="white-space:nowrap;padding:9px 12px;">✏️ Edit</button>
       </div>
     </div>
-    <div class="sch-field">
-      <label>Candidate Name</label>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="text" id="sch-book-name" style="flex:1;">
-        <button onclick="toggleNameEdit()" id="sch-name-edit-btn" style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:8px 12px;font-size:12px;color:#64748b;cursor:pointer;white-space:nowrap;font-family:Inter,sans-serif;">✏️ Edit</button>
-      </div>
+    <div class="fld">
+      <div class="lbl" style="margin:0">Interview Round <span style="color:#dc2626">*</span></div>
+      <select id="b-round"></select>
     </div>
-    <div class="sch-field">
-      <label>Interview Round <span style="color:#dc2626;">*</span></label>
-      <select id="sch-book-round">
-        <option value="">Select round...</option>
-        <option value="Assessment">Assessment</option>
-        <option value="Vendor Screening">Vendor Screening</option>
-        <option value="L1">L1</option>
-        <option value="L2">L2</option>
-        <option value="Implementation Round">Implementation Round</option>
-        <option value="Client Round">Client Round</option>
-      </select>
-    </div>
-    <div class="error-msg" id="sch-book-err"></div>
-    <button class="sch-book-btn" onclick="confirmBooking()">Request Booking</button>
-    <button class="btn-secondary" onclick="closeBookingModal()" style="width:100%;margin-top:8px;text-align:center;">Cancel</button>
+    <div class="berr" id="b-err"></div>
+    <button class="btn-primary" id="b-submit" onclick="submitBooking()">Request Booking</button>
+    <button class="btn-sec" onclick="closeBooking()">Cancel</button>
   </div>
 </div>
 
-
-<!-- CANDIDATE CHANGE PASSWORD MODAL -->
-<div class="modal-overlay" id="candidate-pw-modal" style="display:none;">
-  <div class="modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <h2>🔑 Change Password</h2>
-      <button class="btn-cancel" onclick="closeChangePwModal()" style="padding:4px 10px;">✕</button>
-    </div>
-    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Your new password will be updated immediately.</p>
-    <div class="form-group" style="margin-bottom:12px;">
-      <label style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;">Current Password</label>
-      <input type="password" id="cand-pw-current" placeholder="Enter current password..." style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;width:100%;outline:none;font-family:Inter,sans-serif;margin-top:4px;">
-    </div>
-    <div class="form-group" style="margin-bottom:12px;">
-      <label style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;">New Password</label>
-      <input type="password" id="cand-pw-new" placeholder="Enter new password..." style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;width:100%;outline:none;font-family:Inter,sans-serif;margin-top:4px;">
-    </div>
-    <div class="form-group" style="margin-bottom:16px;">
-      <label style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.07em;font-weight:500;">Confirm New Password</label>
-      <input type="password" id="cand-pw-confirm" placeholder="Confirm new password..." style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:9px 12px;font-size:13px;width:100%;outline:none;font-family:Inter,sans-serif;margin-top:4px;" onkeydown="if(event.key==='Enter')saveCandidatePassword()">
-    </div>
-    <div class="error-msg" id="cand-pw-error"></div>
-    <button class="btn-confirm" id="cand-pw-save-btn" onclick="saveCandidatePassword()" style="width:100%;">Update Password</button>
-  </div>
-</div>
-
+<div class="loading" id="loading"><div class="spin"></div><p id="loading-msg">Loading...</p></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const SHEET_URL='https://script.google.com/macros/s/AKfycbyA62s67bZfq7fRoMk72rpdn2qjvmdD_ZaiAIOfWOV3o5W3s5UuJ5X0rcgpyx_YLwvowg/exec';
-const DEFAULT_PW='ARC123';
-const STATUSES=['Documents Sent','Submitted','Interview Scheduled','Interview Done','Awaiting Feedback','Rejected','On Hold','No Response'];
-const statusColors={'Documents Sent':'badge-purple','Submitted':'badge-amber','Interview Scheduled':'badge-blue','Interview Done':'badge-blue','Awaiting Feedback':'badge-amber','Rejected':'badge-red','On Hold':'badge-gray','No Response':'badge-gray'};
-const US_STATES=['','Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
-const SCH_TIMES=[];
-for(let h=8;h<20;h++){SCH_TIMES.push(`${String(h).padStart(2,'0')}:00`);SCH_TIMES.push(`${String(h).padStart(2,'0')}:30`);}
+const DEFAULT_MANAGER_PW='ARC123';
+const ROOMS=['Room 1','Room 2'];
+const ROUNDS=['Assessment','Vendor Screening','L1','L2','Implementation Round','Client Round'];
+const TZ='America/New_York';
 
-let entries=[],candidateName='',isManager=false,editingId=null,loggedInUser=null;
-let credentials=[];
-let notifEmails=JSON.parse(localStorage.getItem('vct_emails')||'[]');
-let managerPW=localStorage.getItem('vct_manager_pw')||DEFAULT_PW;
-let schBookings=JSON.parse(localStorage.getItem('vct_sch_bookings')||'[]');
-let schCurrentDate=new Date();
-let schSelectedSlot=null,schSelectedDuration=30;
+function pad(n){return String(n).padStart(2,'0');}
+const TIMES=[];for(let m=480;m<1200;m+=30)TIMES.push(pad(Math.floor(m/60))+':'+pad(m%60)); // 08:00 to 19:30 starts; day ends 8:00 PM
 
-// ===== UTILS =====
-function getUrlParam(k){try{return new URLSearchParams(window.location.search).get(k);}catch(e){return null;}}
-function toYMD(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function formatDate(raw){if(!raw)return'—';const s=String(raw);const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[2]}/${m[3]}/${m[1].slice(2)}`:s;}
-function getDateStr(raw){if(!raw)return'';const s=String(raw);const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[1]}-${m[2]}-${m[3]}`:s.slice(0,10);}
-function setSyncStatus(s,m){const el=document.getElementById('sync-status');el.textContent=m;el.className='sync-status '+(s==='ok'?'sync-ok':s==='err'?'sync-err':'sync-loading');}
-function showLoading(m){document.getElementById('loading-msg').textContent=m||'Loading...';document.getElementById('loading-overlay').style.display='flex';}
-function hideLoading(){document.getElementById('loading-overlay').style.display='none';}
-function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'#dc2626':'#16a34a';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
-function populateDL(id){const s=document.getElementById(id);if(s)s.innerHTML=US_STATES.map(st=>`<option value="${st}">${st||'Select state'}</option>`).join('');}
+let credentials=[],managerPW=DEFAULT_MANAGER_PW,session=null,bookings=[],curDate='',pollTimer=null;
+let slot=null,duration=30,submitting=false;
 
-// ===== SHEETS =====
-async function fetchFromSheet(){const res=await fetch(SHEET_URL+'?t='+Date.now());return(await res.json()).rows||[];}
-async function postToSheet(p){const res=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify(p)});return await res.json();}
-function rowsToEntries(rows){
-  if(!rows||rows.length<2)return[];
-  return rows.slice(1).map(r=>({
-    id:String(r[0]||''),candidate:String(r[1]||''),date:String(r[2]||''),
-    vendor:String(r[3]||''),phone:String(r[4]||''),vendorEmail:String(r[5]||''),
-    vendorCompany:String(r[6]||''),implPartner:String(r[7]||''),client:String(r[8]||''),
-    position:String(r[9]||''),location:String(r[10]||''),dl:String(r[11]||''),
-    india:String(r[12]||''),mylocation:String(r[13]||''),
-    update:(()=>{const raw=String(r[14]||'').toUpperCase().trim();const match=STATUSES.find(s=>s.toUpperCase()===raw);return match||raw;})(),
-    comments:String(r[15]||'')
-  })).filter(e=>e.id&&(e.client||e.candidate||e.vendor));
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function toast(msg,err){const t=$('toast');t.textContent=msg;t.style.background=err?'#dc2626':'#16a34a';t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('show');},3000);}
+function setSync(s,m){const el=$('sync');el.textContent=m;el.className='sync '+(s==='ok'?'sync-ok':s==='err'?'sync-err':'sync-loading');}
+function showLoading(on,msg){$('loading').style.display=on?'flex':'none';if(msg)$('loading-msg').textContent=msg;}
+
+/* ---------- date / time helpers (all EST) ---------- */
+function nowEST(){
+  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+  const o={};parts.forEach(function(p){o[p.type]=p.value;});
+  return {date:o.year+'-'+o.month+'-'+o.day,mins:parseInt(o.hour,10)*60+parseInt(o.minute,10)};
+}
+function addDays(key,n){const d=new Date(key+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
+function weekRange(key){const dow=new Date(key+'T12:00:00Z').getUTCDay();const mon=addDays(key,-(dow===0?6:dow-1));return {mon:mon,sun:addDays(mon,6)};}
+function fmtLong(key){return new Date(key+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'long',month:'short',day:'numeric',year:'numeric'});}
+function fmtShort(key){return new Date(key+'T12:00:00Z').toLocaleDateString('en-US',{timeZone:'UTC',weekday:'short',month:'short',day:'numeric'});}
+function fmtQuick(key){const d=new Date(key+'T12:00:00Z');return d.getUTCDate()+' '+d.toLocaleDateString('en-US',{timeZone:'UTC',weekday:'short'});}
+function fmtTime(t){const h=parseInt(t.slice(0,2),10),m=t.slice(3,5);return (h>12?h-12:(h===0?12:h))+':'+m+' '+(h>=12?'PM':'AM');}
+function toMins(t){return parseInt(t.slice(0,2),10)*60+parseInt(t.slice(3,5),10);}
+function fmtDur(d){return d===60?'1 hour':d+' min';}
+function slotsNeeded(d){return d===45?2:Math.ceil(d/30);}
+function slotTimes(start,dur){const i=TIMES.indexOf(start);return i<0?[]:TIMES.slice(i,i+slotsNeeded(dur));}
+function isPast(date,time){const n=nowEST();if(date<n.date)return true;if(date>n.date)return false;return toMins(time)<n.mins;}
+function cmp(a,b){return a.date===b.date?(a.time<b.time?-1:a.time>b.time?1:0):(a.date<b.date?-1:1);}
+
+/* ---------- API ---------- */
+async function apiGet(q){const r=await fetch(SHEET_URL+'?'+q+'&t='+Date.now());return r.json();}
+async function apiPost(p){const r=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify(p)});return r.json();}
+
+async function loadCredentials(){
+  const d=await apiGet('action=getCredentials');
+  const seen=new Set();
+  credentials=(d.credentials||[]).map(function(c){return {candidateName:String(c.candidateName).toUpperCase(),username:String(c.username).toUpperCase(),password:String(c.password)};})
+    .filter(function(c){if(seen.has(c.username))return false;seen.add(c.username);return true;});
+  if(d.managerPassword)managerPW=String(d.managerPassword);
 }
 
-async function loadCredentialsFromSheet(){
+async function loadBookings(silent){
   try{
-    const res=await fetch(SHEET_URL+'?action=getCredentials&t='+Date.now());
-    const data=await res.json();
-    if(data.credentials){
-    const seen=new Set();
-    credentials=data.credentials
-      .map(c=>({...c,username:c.username.toUpperCase(),candidateName:c.candidateName.toUpperCase()}))
-      .filter(c=>{if(seen.has(c.username))return false;seen.add(c.username);return true;});
-  }
-    if(data.managerPassword){managerPW=data.managerPassword;localStorage.setItem('vct_manager_pw',managerPW);}
-  }catch(e){credentials=JSON.parse(localStorage.getItem('vct_credentials_v1')||'[]');}
-}
-
-function saveCredentialsLocal(){localStorage.setItem('vct_credentials_v1',JSON.stringify(credentials));}
-async function saveCredentialsToSheet(){
-  // Deduplicate by username before saving
-  const seen = new Set();
-  const deduped = credentials.filter(c => {
-    const key = c.username.toUpperCase();
-    if(seen.has(key)) return false;
-    seen.add(key);
+    const d=await apiGet('action=getBookings');
+    if(!Array.isArray(d.bookings))throw new Error('bookings endpoint missing');
+    bookings=d.bookings;
+    setSync('ok','✓ Live');
     return true;
-  });
-  credentials = deduped;
-  try{await postToSheet({action:'saveCredentials',credentials,managerPassword:managerPW});saveCredentialsLocal();}
-  catch(e){saveCredentialsLocal();showToast('Saved locally',true);}
-}
-
-async function refreshData(){
-  setSyncStatus('loading','Syncing...');
-  try{entries=rowsToEntries(await fetchFromSheet());setSyncStatus('ok','✓ Live');renderTable();updateStats();if(isManager)populateCandidateFilter();}
-  catch(e){setSyncStatus('err','✗ Offline');showToast('Could not reach Google Sheets',true);}
-}
-
-// ===== LOGIN =====
-async function doLogin(){
-  const username=document.getElementById('login-username').value.trim().toUpperCase();
-  const password=document.getElementById('login-password').value;
-  const errEl=document.getElementById('login-err');
-  const btn=document.getElementById('login-btn');
-  errEl.style.display='none';
-  if(!username||!password){errEl.textContent='Please enter username and password.';errEl.style.display='block';return;}
-  btn.disabled=true;btn.textContent='Checking...';
-
-  if(username.toUpperCase()==='MANAGER'&&password===managerPW){
-    btn.disabled=false;btn.textContent='Login';
-    localStorage.setItem('vct_is_manager','true');
-    document.getElementById('login-screen').classList.remove('show');
-    document.getElementById('main-app').style.display='block';
-    document.getElementById('app-nav').classList.add('show');
-    isManager=true;
-    document.getElementById('manager-banner').style.display='flex';
-    document.getElementById('form-section').style.display='none';
-    document.getElementById('manager-btn').classList.add('active');
-    document.getElementById('th-candidate').style.display='';
-    document.getElementById('filter-candidate').style.display='';
-    showLoading('Loading all data...');
-    try{
-      entries=rowsToEntries(await fetchFromSheet());
-      await loadCredentialsFromSheet();
-      setSyncStatus('ok','✓ Live');hideLoading();
-      populateCandidateFilter();updateHeaderName();renderTable();updateStats();
-    }catch(e){setSyncStatus('err','✗ Offline');hideLoading();}
-    return;
+  }catch(e){
+    setSync('err','✗ Offline');
+    if(!silent)toast('Could not load bookings. Check the Apps Script deployment.',true);
+    return false;
   }
+}
 
+/* ---------- login / session ---------- */
+function showErr(m){const e=$('login-err');e.textContent=m;e.style.display='block';}
+async function doLogin(){
+  const u=$('login-username').value.trim().toUpperCase();
+  const p=$('login-password').value;
+  $('login-err').style.display='none';
+  if(!u||!p){showErr('Please enter username and password.');return;}
+  const btn=$('login-btn');btn.disabled=true;btn.textContent='Checking...';
   try{
-    await loadCredentialsFromSheet();
-    const user=credentials.find(c=>c.username.toUpperCase()===username.toUpperCase()&&c.password===password);
-    if(user){
-      loggedInUser=user;
-      candidateName=user.candidateName.toUpperCase();
-      localStorage.setItem('vct_candidate_name',candidateName);
-      localStorage.setItem('vct_username',user.username.toUpperCase());
-      btn.disabled=false;btn.textContent='Login';
-      document.getElementById('login-screen').classList.remove('show');
-      document.getElementById('main-app').style.display='block';
-      document.getElementById('app-nav').classList.add('show');
-      document.getElementById('f-candidate').value=candidateName;
-      document.getElementById('candidate-export-btn').style.display='flex';
-      document.getElementById('change-pw-btn').style.display='flex';
-      updateHeaderName();
-      showLoading('Loading your data...');
-      try{entries=rowsToEntries(await fetchFromSheet());setSyncStatus('ok','✓ Live');hideLoading();renderTable();updateStats();}
-      catch(e){setSyncStatus('err','✗ Offline');hideLoading();}
-      return;
+    await loadCredentials();
+    if(u==='MANAGER'&&p===managerPW){session={role:'manager'};}
+    else{
+      const c=credentials.find(function(x){return x.username===u&&x.password===p;});
+      if(!c){showErr('Invalid username or password.');$('login-password').value='';return;}
+      session={role:'candidate',username:c.username,name:c.candidateName};
     }
-    btn.disabled=false;btn.textContent='Login';
-    errEl.textContent='Invalid username or password.';errEl.style.display='block';
-    document.getElementById('login-password').value='';
-    document.getElementById('login-password').focus();
-  }catch(e){btn.disabled=false;btn.textContent='Login';errEl.textContent='Connection error. Try again.';errEl.style.display='block';}
+    localStorage.setItem('sch_session',JSON.stringify(session));
+    await startApp();
+  }catch(e){showErr('Connection error. Please try again.');}
+  finally{btn.disabled=false;btn.textContent='Login';}
+}
+
+async function startApp(){
+  $('login-screen').classList.remove('show');
+  $('main-app').style.display='block';
+  $('user-badge').textContent=session.role==='manager'?'MANAGER':session.name;
+  curDate=nowEST().date;
+  showLoading(true,'Loading bookings...');
+  await loadBookings();
+  showLoading(false);
+  render();
+  clearInterval(pollTimer);
+  pollTimer=setInterval(poll,30000);
 }
 
 function logout(){
-  loggedInUser=null;candidateName='';isManager=false;
-  localStorage.removeItem('vct_candidate_name');
-  localStorage.removeItem('vct_username');
-  localStorage.removeItem('vct_is_manager');
-  document.getElementById('main-app').style.display='none';
-  document.getElementById('change-pw-btn').style.display='none';
-  document.getElementById('app-nav').classList.remove('show');
-  document.getElementById('login-screen').classList.add('show');
-  document.getElementById('login-username').value='';
-  document.getElementById('login-password').value='';
-  document.getElementById('login-err').style.display='none';
-  document.getElementById('manager-banner').style.display='none';
-  document.getElementById('form-section').style.display='block';
-  document.getElementById('manager-btn').classList.remove('active');
-  document.getElementById('th-candidate').style.display='none';
-  document.getElementById('filter-candidate').style.display='none';
-  entries=[];renderTable();updateStats();
-  switchAppTab('tracker');
+  session=null;bookings=[];clearInterval(pollTimer);
+  localStorage.removeItem('sch_session');
+  $('main-app').style.display='none';
+  $('login-username').value='';$('login-password').value='';$('login-err').style.display='none';
+  $('login-screen').classList.add('show');
 }
 
-function updateHeaderName(){document.getElementById('header-name').textContent=isManager?'Manager':(candidateName||'—');}
-
-// ===== APP TABS =====
-function switchAppTab(tab){
-  document.getElementById('nav-tracker').classList.toggle('active',tab==='tracker');
-  document.getElementById('nav-scheduler').classList.toggle('active',tab==='scheduler');
-  const show=tab==='tracker';
-  document.getElementById('tracker-content').style.display=show?'block':'none';
-  document.getElementById('scheduler-section').style.display=show?'none':'block';
-  const mgrBanner=document.getElementById('manager-banner');
-  if(mgrBanner)mgrBanner.style.display=show&&isManager?'flex':'none';
-  if(!show){
-    setTimeout(()=>{
-      renderScheduler();
-      if(isManager){
-        const s=document.getElementById('sch-mgr-section');
-        s.style.display='block';
-        s.style.setProperty('display','block','important');
-        renderManagerApprovals();
-      }
-    }, 100);
-  }
+async function refresh(){setSync('loading','Syncing...');const ok=await loadBookings();if(ok){render();toast('Refreshed');}}
+async function poll(){
+  if(!session||document.hidden||$('booking-modal').style.display==='flex')return;
+  if(await loadBookings(true))render();
 }
 
-// ===== FORM =====
-function toggleForm(){
-  const form=document.getElementById('entry-form');const icon=document.getElementById('toggle-icon');const label=document.getElementById('toggle-label');
-  const hidden=form.classList.contains('form-hidden');form.classList.toggle('form-hidden',!hidden);
-  icon.className=hidden?'ti ti-minus':'ti ti-plus';label.textContent=hidden?'Close form':'Log new vendor contact';
-  if(hidden){const d=document.getElementById('f-date');if(!d.value)d.value=toYMD(new Date());}
-}
-function clearForm(){
-  ['f-date','f-vendor','f-phone','f-vendor-email','f-vendor-company','f-impl-partner','f-client','f-position','f-location','f-india','f-mylocation','f-comments'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-update').value='';document.getElementById('f-dl').value='';
-}
-
-async function addEntry(){
-  if(!candidateName){showToast('Please login first',true);return;}
-  const get=id=>document.getElementById(id).value.trim();
-  if(!get('f-client')&&!get('f-vendor')){showToast('At least Client or Vendor Name is required',true);return;}
-  const entry={action:'add',id:String(Date.now()),candidate:candidateName,date:get('f-date')||toYMD(new Date()),vendor:get('f-vendor'),phone:get('f-phone'),vendorEmail:get('f-vendor-email'),vendorCompany:get('f-vendor-company'),implPartner:get('f-impl-partner'),client:get('f-client'),position:get('f-position'),location:get('f-location'),dl:document.getElementById('f-dl').value,india:get('f-india'),mylocation:get('f-mylocation'),update:document.getElementById('f-update').value,comments:get('f-comments')};
-  const btn=document.getElementById('save-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader"></i> Saving...';setSyncStatus('loading','Saving...');
-  try{await postToSheet(entry);entries.unshift(entry);setSyncStatus('ok','✓ Saved');clearForm();renderTable();updateStats();showToast('✓ Saved to Google Sheets!');}
-  catch(e){setSyncStatus('err','✗ Failed');showToast('Save failed',true);}
-  finally{btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy"></i> Submit';}
-}
-
-// ===== EDIT =====
-function openEditModal(id){
-  const e=entries.find(e=>e.id===String(id));if(!e)return;
-  editingId=String(id);
-  document.getElementById('e-date').value=getDateStr(e.date);
-  document.getElementById('e-vendor').value=e.vendor||'';
-  document.getElementById('e-phone').value=e.phone||'';
-  document.getElementById('e-vendor-email').value=e.vendorEmail||'';
-  document.getElementById('e-vendor-company').value=e.vendorCompany||'';
-  document.getElementById('e-impl-partner').value=e.implPartner||'';
-  document.getElementById('e-client').value=e.client||'';
-  document.getElementById('e-position').value=e.position||'';
-  document.getElementById('e-location').value=e.location||'';
-  document.getElementById('e-dl').value=e.dl||'';
-  document.getElementById('e-india').value=e.india||'';
-  document.getElementById('e-mylocation').value=e.mylocation||'';
-  const matchedStatus=STATUSES.find(s=>s.toUpperCase()===(e.update||'').toUpperCase())||'';
-  document.getElementById('e-update').value=matchedStatus;
-  document.getElementById('e-comments').value=e.comments||'';
-  document.getElementById('edit-modal').style.display='flex';
-}
-function closeEditModal(){document.getElementById('edit-modal').style.display='none';editingId=null;}
-
-async function saveEditEntry(){
-  if(!editingId)return;
-  const get=id=>document.getElementById(id).value.trim();
-  const updated={action:'updateRow',id:editingId,date:get('e-date'),vendor:get('e-vendor'),phone:get('e-phone'),vendorEmail:get('e-vendor-email'),vendorCompany:get('e-vendor-company'),implPartner:get('e-impl-partner'),client:get('e-client'),position:get('e-position'),location:get('e-location'),dl:document.getElementById('e-dl').value,india:get('e-india'),mylocation:get('e-mylocation'),update:document.getElementById('e-update').value,comments:get('e-comments')};
-  const btn=document.getElementById('edit-save-btn');btn.disabled=true;btn.innerHTML='<i class="ti ti-loader"></i> Saving...';setSyncStatus('loading','Updating...');
-  try{
-    await postToSheet(updated);
-    const e=entries.find(e=>e.id===editingId);
-    if(e)Object.assign(e,{date:updated.date,vendor:updated.vendor,phone:updated.phone,vendorEmail:updated.vendorEmail,vendorCompany:updated.vendorCompany,implPartner:updated.implPartner,client:updated.client,position:updated.position,location:updated.location,dl:updated.dl,india:updated.india,mylocation:updated.mylocation,update:updated.update,comments:updated.comments});
-    setSyncStatus('ok','✓ Live');closeEditModal();renderTable();updateStats();showToast('✓ Entry updated!');
-  }catch(err){setSyncStatus('err','✗ Failed');showToast('Update failed',true);}
-  finally{btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy"></i> Save Changes';}
-}
-
-async function updateStatus(id,val){
-  const e=entries.find(e=>e.id===String(id));if(!e)return;e.update=val;updateStats();setSyncStatus('loading','Updating...');
-  try{await postToSheet({action:'updateStatus',id:String(id),update:val});setSyncStatus('ok','✓ Live');showToast('Status updated');}
-  catch(err){setSyncStatus('err','✗ Failed');}
-}
-
-async function confirmDelete(id){
-  if(confirm('Delete this entry? This will permanently remove it from Google Sheets.')){
-    setSyncStatus('loading','Deleting...');
-    try{
-      const result=await postToSheet({action:'deleteRow',id:String(id)});
-      entries=entries.filter(e=>e.id!==String(id));
-      setSyncStatus('ok','✓ Live');renderTable();updateStats();showToast('✓ Entry deleted');
-      await refreshData();
-    }catch(e){setSyncStatus('err','✗ Failed');showToast('Delete failed',true);}
-  }
-}
-
-// ===== DATE FILTERS =====
-function setQuick(type){
-  const now=new Date();let from,to;
-  if(type==='today'){from=to=toYMD(now);}
-  else if(type==='week'){const day=now.getDay();const mon=new Date(now);mon.setDate(now.getDate()-(day===0?6:day-1));const sun=new Date(mon);sun.setDate(mon.getDate()+6);from=toYMD(mon);to=toYMD(sun);}
-  else if(type==='month'){const y=now.getFullYear(),m=now.getMonth();from=`${y}-${String(m+1).padStart(2,'0')}-01`;to=toYMD(new Date(y,m+1,0));}
-  else if(type==='last30'){const d=new Date(now);d.setDate(now.getDate()-29);from=toYMD(d);to=toYMD(now);}
-  document.getElementById('filter-date-from').value=from;document.getElementById('filter-date-to').value=to;
-  document.querySelectorAll('.qd-btn').forEach(b=>b.classList.remove('active'));document.getElementById('qd-'+type).classList.add('active');renderTable();
-}
-function clearQuick(){document.querySelectorAll('.qd-btn').forEach(b=>b.classList.remove('active'));}
-function clearDates(){document.getElementById('filter-date-from').value='';document.getElementById('filter-date-to').value='';clearQuick();renderTable();}
-
-// ===== TABLE =====
-function renderTable(){
-  const search=(document.getElementById('search-input').value||'').toLowerCase();
-  const statusF=document.getElementById('filter-status').value;
-  const candidateF=document.getElementById('filter-candidate').value;
-  const dateFrom=document.getElementById('filter-date-from').value;
-  const dateTo=document.getElementById('filter-date-to').value;
-  const pool=isManager?entries:entries.filter(e=>(e.candidate||'').toLowerCase().trim()===(candidateName||'').toLowerCase().trim());
-  const searchFields=isManager?['client','vendor','vendorEmail','vendorCompany','position','location','candidate','implPartner','comments','update','india','mylocation','dl']:['client','vendor','vendorEmail','vendorCompany','position','location','implPartner','comments','update','india','mylocation','dl'];
-  const filtered=pool.filter(e=>{
-    const ms=!search||searchFields.some(k=>(e[k]||'').toLowerCase().includes(search));
-    const mf=!statusF||e.update===statusF;const mc=!candidateF||e.candidate===candidateF;
-    const eDate=getDateStr(e.date);return ms&&mf&&mc&&(!dateFrom||eDate>=dateFrom)&&(!dateTo||eDate<=dateTo);
+/* ---------- render ---------- */
+function buildOcc(){
+  const occ={};
+  bookings.forEach(function(b){
+    if(b.status!=='pending'&&b.status!=='confirmed')return;
+    slotTimes(b.time,b.duration).forEach(function(t,i){occ[b.date+'|'+b.room+'|'+t]={b:b,first:i===0};});
   });
-  document.getElementById('row-count').textContent=filtered.length?`${filtered.length} result${filtered.length!==1?'s':''}`:' ';
-  const tbody=document.getElementById('table-body');const empty=document.getElementById('empty-state');
-  if(!filtered.length){updateStats();tbody.innerHTML='';document.getElementById('empty-msg').textContent=pool.length?'No entries match filters.':'No entries yet. Log your first vendor contact above.';empty.style.display='block';return;}
-  updateStats();
-  empty.style.display='none';
-  tbody.innerHTML=filtered.map(e=>`<tr>
-    <td class="td-date">${formatDate(e.date)}</td>
-    ${isManager?`<td class="td-candidate">${e.candidate||'—'}</td>`:''}
-    <td>${e.vendor||'—'}</td>
-    <td class="td-phone">${e.phone||'—'}</td>
-    <td style="font-size:12px;color:#2563eb;">${e.vendorEmail||'—'}</td>
-    <td class="td-bold">${e.vendorCompany||'—'}</td>
-    <td style="color:#7c3aed;">${e.implPartner||'—'}</td>
-    <td class="td-bold">${e.client||'—'}</td>
-    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${e.position||''}">${e.position||'—'}</td>
-    <td>${e.location||'—'}</td>
-    <td>${e.dl?`<span class="badge badge-blue">${e.dl}</span>`:'—'}</td>
-    <td style="color:#64748b;">${e.india||'—'}</td>
-    <td style="color:#64748b;">${e.mylocation||'—'}</td>
-    <td><select class="status-select badge ${statusColors[e.update]||'badge-gray'}" onchange="updateStatus('${e.id}',this.value)">
-      <option value="" ${!e.update?'selected':''}>—</option>
-      ${STATUSES.map(s=>`<option ${(e.update||'').toUpperCase()===s.toUpperCase()?'selected':''} value="${s}">${s}</option>`).join('')}
-    </select></td>
-    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:12px;" title="${e.comments||''}">${e.comments||'—'}</td>
-    <td style="white-space:nowrap;">
-      <button class="btn-icon" onclick="openEditModal('${e.id}')" title="Edit"><i class="ti ti-pencil"></i></button>
-      ${!isManager?`<button class="btn-icon del" onclick="confirmDelete('${e.id}')" title="Delete"><i class="ti ti-trash"></i></button>`:''}
-    </td>
-  </tr>`).join('');
+  return occ;
 }
 
-function updateStats(){
-  const candidatePool=isManager?entries:entries.filter(e=>(e.candidate||'').toLowerCase().trim()===(candidateName||'').toLowerCase().trim());
-
-  // Apply same date + status + search filters as table
-  const dateFrom=document.getElementById('filter-date-from').value;
-  const dateTo=document.getElementById('filter-date-to').value;
-  const statusF=document.getElementById('filter-status').value;
-  const candidateF=document.getElementById('filter-candidate').value;
-  const search=(document.getElementById('search-input').value||'').toLowerCase();
-  const searchFields=isManager?['client','vendor','vendorEmail','vendorCompany','position','location','candidate','implPartner','comments','update','india','mylocation','dl']:['client','vendor','vendorEmail','vendorCompany','position','location','implPartner','comments','update','india','mylocation','dl'];
-
-  const pool=candidatePool.filter(e=>{
-    const eDate=getDateStr(e.date);
-    const ms=!search||searchFields.some(k=>(e[k]||'').toLowerCase().includes(search));
-    const mf=!statusF||e.update===statusF;
-    const mc=!candidateF||e.candidate===candidateF;
-    return ms&&mf&&mc&&(!dateFrom||eDate>=dateFrom)&&(!dateTo||eDate<=dateTo);
-  });
-
-  // This week count always based on current week from filtered pool
-  const today=new Date();today.setHours(0,0,0,0);
-  const day=today.getDay();
-  const mon=new Date(today);mon.setDate(today.getDate()-(day===0?6:day-1));
-  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
-  const monKey=toYMD(mon);const sunKey=toYMD(sun);
-
-  // All stats from filtered pool
-  document.getElementById('stat-total').textContent=pool.length;
-  document.getElementById('stat-interviews').textContent=pool.filter(e=>(e.update||'').toUpperCase().includes('INTERVIEW')).length;
-  document.getElementById('stat-pending').textContent=pool.filter(e=>['SUBMITTED','AWAITING FEEDBACK','DOCUMENTS SENT','INTERVIEW SCHEDULED','INTERVIEW DONE'].includes((e.update||'').toUpperCase())).length;
-  // This week always counts from filtered pool within current week
-  document.getElementById('stat-thisweek').textContent=pool.filter(e=>{const d=getDateStr(e.date);return d>=monKey&&d<=sunKey;}).length;
-}
-
-function populateCandidateFilter(){
-  const names=[...new Set(entries.map(e=>e.candidate).filter(Boolean))].sort();
-  document.getElementById('filter-candidate').innerHTML='<option value="">All candidates</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join('');
-}
-
-// ===== EXPORT =====
-function exportMyCsv(){
-  const data=entries.filter(e=>(e.candidate||'').toLowerCase().trim()===(candidateName||'').toLowerCase().trim());
-  if(!data.length){showToast('No entries to export',true);return;}
-  const headers=['ID','Candidate','Date','Vendor Name','Vendor Phone','Vendor Email','Vendor Company','Implementation Partner','Client','Position','Location Requested','DL Submitted','India Team RM','My Location','Status','Comments'];
-  const rows=data.map(e=>[e.id,e.candidate,e.date,e.vendor,e.phone,e.vendorEmail,e.vendorCompany,e.implPartner,e.client,e.position,e.location,e.dl,e.india,e.mylocation,e.update,e.comments].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
-  const csv=[headers.join(','),...rows].join('\n');
-  const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`${candidateName}_contacts_${toYMD(new Date())}.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);showToast('✓ Your data downloaded!');
-}
-
-// ===== MANAGER =====
-function openManagerModal(){
-  if(isManager){document.getElementById('manager-panel').style.display='flex';renderLoginList();renderPendingRegistrations();renderEmailChips();populateExportFilter();updatePWDisplay();return;}
-  document.getElementById('manager-modal').style.display='flex';
-  document.getElementById('pw-input').value='';document.getElementById('pw-error').style.display='none';
-  setTimeout(()=>document.getElementById('pw-input').focus(),100);
-}
-function closeManagerModal(){document.getElementById('manager-modal').style.display='none';}
-function closeManagerPanel(){document.getElementById('manager-panel').style.display='none';}
-
-async function checkPassword(){
-  if(document.getElementById('pw-input').value===managerPW){
-    isManager=true;closeManagerModal();
-    document.getElementById('manager-banner').style.display='flex';
-    document.getElementById('form-section').style.display='none';
-    document.getElementById('manager-btn').classList.add('active');
-    document.getElementById('th-candidate').style.display='';
-    document.getElementById('filter-candidate').style.display='';
-    showLoading('Loading all data...');await refreshData();hideLoading();
-    populateCandidateFilter();updateHeaderName();showToast('✓ Manager view unlocked');
-    document.getElementById('manager-panel').style.display='flex';
-    renderLoginList();renderPendingRegistrations();renderEmailChips();populateExportFilter();updatePWDisplay();
-  }else{
-    document.getElementById('pw-error').style.display='block';document.getElementById('pw-input').value='';document.getElementById('pw-input').focus();
+function cell(date,time,room,occ,isMgr){
+  const o=occ[date+'|'+room+'|'+time];
+  if(o){
+    const b=o.b,cls=b.status==='pending'?'pending':'booked';
+    const label=o.first?esc(b.name)+' · '+esc(b.round):'↳ '+esc(b.name);
+    return '<button class="slot '+cls+(o.first?'':' cont')+'" disabled title="'+(b.status==='pending'?'Pending approval':'Booked')+'">'+label+'</button>';
   }
+  if(isPast(date,time))return '<button class="slot past" disabled>—</button>';
+  if(isMgr)return '<button class="slot available" disabled>Available</button>';
+  return '<button class="slot available" onclick="openBooking(\''+date+'\',\''+time+'\',\''+room+'\')">Available</button>';
 }
 
-function exitManagerView(){
-  isManager=false;document.getElementById('manager-banner').style.display='none';document.getElementById('form-section').style.display='block';
-  document.getElementById('manager-btn').classList.remove('active');document.getElementById('th-candidate').style.display='none';document.getElementById('filter-candidate').style.display='none';
-  updateHeaderName();renderTable();updateStats();
-}
-
-// ===== LOGINS =====
-function renderLoginList(){
-  document.getElementById('login-count').textContent=`${credentials.length} login${credentials.length!==1?'s':''}`;
-  const list=document.getElementById('login-list');
-  if(!credentials.length){list.innerHTML='<p style="font-size:13px;color:#94a3b8;text-align:center;padding:12px;">No logins added yet.</p>';return;}
-  list.innerHTML=credentials.map((c,i)=>`<div class="cand-item">
-    <div style="display:flex;flex-direction:column;gap:2px;">
-      <span class="cand-name">${c.candidateName}</span>
-      <span style="font-size:11px;color:#94a3b8;font-family:JetBrains Mono,monospace;" id="login-meta-${i}">@${c.username} · ${'•'.repeat(c.password.length)}</span>
-      <div id="login-edit-form-${i}" style="display:none;margin-top:8px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
-          <input type="text" id="edit-uname-${i}" value="${c.username}" style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:6px 10px;font-size:12px;color:#1a1d23;outline:none;width:100%;font-family:Inter,sans-serif;">
-          <input type="text" id="edit-pass-${i}" value="${c.password}" style="background:#f8fafc;border:1px solid #e2e6ea;border-radius:6px;padding:6px 10px;font-size:12px;color:#1a1d23;outline:none;width:100%;font-family:Inter,sans-serif;">
-        </div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="saveLoginEdit(${i})" style="background:#2563eb;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">Save</button>
-          <button onclick="cancelLoginEdit(${i})" style="background:#fff;color:#64748b;border:1px solid #e2e6ea;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Inter,sans-serif;">Cancel</button>
-        </div>
-      </div>
-    </div>
-    <div style="display:flex;gap:6px;align-items:flex-start;">
-      <button onclick="toggleLoginEdit(${i})" style="background:transparent;border:1px solid #bfdbfe;border-radius:4px;padding:3px 8px;font-size:11px;color:#2563eb;cursor:pointer;font-weight:500;font-family:Inter,sans-serif;" id="edit-btn-${i}">✏️ Edit</button>
-      <button class="btn-remove-cand" onclick="removeLogin(${i})">✕ Remove</button>
-    </div>
-  </div>`).join('');
-}
-
-function toggleLoginEdit(i){
-  const form=document.getElementById('login-edit-form-'+i);const btn=document.getElementById('edit-btn-'+i);
-  const hidden=form.style.display==='none'||!form.style.display;
-  form.style.display=hidden?'block':'none';btn.textContent=hidden?'✕ Cancel':'✏️ Edit';
-}
-function cancelLoginEdit(i){document.getElementById('login-edit-form-'+i).style.display='none';document.getElementById('edit-btn-'+i).textContent='✏️ Edit';}
-
-async function saveLoginEdit(i){
-  const newUsername=document.getElementById('edit-uname-'+i).value.trim().toLowerCase();
-  const newPassword=document.getElementById('edit-pass-'+i).value.trim();
-  if(!newUsername||!newPassword){showToast('Username and password required',true);return;}
-  if(credentials.some((c,idx)=>idx!==i&&c.username.toLowerCase()===newUsername)){showToast('Username already exists',true);return;}
-  credentials[i].username=newUsername;credentials[i].password=newPassword;
-  await saveCredentialsToSheet();renderLoginList();showToast('✓ Login updated for '+credentials[i].candidateName);
-}
-
-async function addLogin(){
-  const name=document.getElementById('new-login-name').value.trim().toUpperCase();
-  const username=document.getElementById('new-login-username').value.trim().toLowerCase();
-  const password=document.getElementById('new-login-password').value.trim();
-  if(!name||!username||!password){showToast('All fields required',true);return;}
-  if(credentials.some(c=>c.username.toLowerCase()===username)){showToast('Username already exists',true);return;}
-  credentials.push({candidateName:name,username,password});
-  await saveCredentialsToSheet();
-  document.getElementById('new-login-name').value='';document.getElementById('new-login-username').value='';document.getElementById('new-login-password').value='';
-  renderLoginList();showToast('✓ Added: '+name);
-}
-
-async function removeLogin(i){
-  const name=credentials[i].candidateName;
-  if(confirm(`Remove login for "${name}"?\n\nThey will not be able to login anymore.`)){
-    credentials.splice(i,1);await saveCredentialsToSheet();renderLoginList();showToast('Removed: '+name);
-  }
-}
-
-// ===== EMAILS =====
-function renderEmailChips(){
-  const wrap=document.getElementById('email-chips');
-  if(!notifEmails.length){wrap.innerHTML='<span style="font-size:12px;color:#94a3b8;">No emails added yet.</span>';return;}
-  wrap.innerHTML=notifEmails.map((e,i)=>`<div class="email-chip">${e}<button onclick="removeEmail(${i})">×</button></div>`).join('');
-  document.getElementById('email-script-preview').textContent=`const NOTIFY = ${JSON.stringify(notifEmails)};\nNOTIFY.forEach(email => GmailApp.sendEmail(\n  email,\n  'New entry by ' + data.candidate,\n  'Client: ' + data.client +\n  '\\nPosition: ' + data.position +\n  '\\nStatus: ' + data.update\n));`;
-}
-function addEmail(){
-  const val=document.getElementById('new-email-input').value.trim();
-  if(!val||!val.includes('@')){showToast('Enter a valid email',true);return;}
-  if(notifEmails.includes(val)){showToast('Already added',true);return;}
-  notifEmails.push(val);localStorage.setItem('vct_emails',JSON.stringify(notifEmails));document.getElementById('new-email-input').value='';renderEmailChips();showToast('Email added');
-}
-function removeEmail(i){notifEmails.splice(i,1);localStorage.setItem('vct_emails',JSON.stringify(notifEmails));renderEmailChips();}
-
-// ===== PASSWORD =====
-function updatePWDisplay(){document.getElementById('current-pw-display').textContent=managerPW;}
-async function changePassword(){
-  const p1=document.getElementById('new-pw-1').value;const p2=document.getElementById('new-pw-2').value;
-  const errEl=document.getElementById('pw-change-error');errEl.style.display='none';
-  if(!p1||p1.length<4){errEl.textContent='Minimum 4 characters.';errEl.style.display='block';return;}
-  if(p1!==p2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
-  managerPW=p1;localStorage.setItem('vct_manager_pw',managerPW);
-  document.getElementById('new-pw-1').value='';document.getElementById('new-pw-2').value='';
-  updatePWDisplay();
-  try{
-    await saveCredentialsToSheet();
-    showToast('✓ Password updated on all devices!');
-  }catch(e){
-    showToast('✓ Password updated locally');
-  }
-}
-
-// ===== EXPORT CSV =====
-function populateExportFilter(){
-  const names=[...new Set(entries.map(e=>e.candidate).filter(Boolean))].sort();
-  document.getElementById('export-filter-candidate').innerHTML='<option value="">All candidates</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join('');
-}
-function exportCSV(){
-  const cF=document.getElementById('export-filter-candidate').value;const sF=document.getElementById('export-filter-status').value;
-  const data=entries.filter(e=>(!cF||e.candidate===cF)&&(!sF||e.update===sF));
-  if(!data.length){showToast('No data to export',true);return;}
-  const headers=['ID','Candidate','Date','Vendor Name','Vendor Phone','Vendor Email','Vendor Company','Implementation Partner','Client','Position','Location Requested','DL Submitted','India Team RM','My Location','Status','Comments'];
-  const rows=data.map(e=>[e.id,e.candidate,e.date,e.vendor,e.phone,e.vendorEmail,e.vendorCompany,e.implPartner,e.client,e.position,e.location,e.dl,e.india,e.mylocation,e.update,e.comments].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
-  const csv=[headers.join(','),...rows].join('\n');
-  const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`vendor_tracker_${toYMD(new Date())}.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);showToast('✓ CSV downloaded!');
-}
-
-function switchMgrTab(tab){
-  ['logins','emails','export','password'].forEach(t=>{
-    document.getElementById('panel-'+t).style.display=t===tab?'block':'none';
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
-  });
-  if(tab==='export')populateExportFilter();
-  if(tab==='password')updatePWDisplay();
-}
-
-// ===== INTERVIEW SCHEDULER =====
-function saveSchBookings(){localStorage.setItem('vct_sch_bookings',JSON.stringify(schBookings));}
-function schFmtDate(d){const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return`${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;}
-function schFmtShort(d){const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];return`${d.getDate()} ${days[d.getDay()]}`;}
-function schDateKey(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function fmtSchDate(dateKey){if(!dateKey)return'';const d=new Date(dateKey+'T00:00:00');const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return`${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;}
-function fmtSchTime(time){if(!time)return'';const[h,m]=time.split(':');const hr=parseInt(h);const ampm=hr>=12?'PM':'AM';const hr12=hr>12?hr-12:(hr===0?12:hr);return`${hr12}:${m} ${ampm}`;}
-function fmtDuration(mins){if(mins===30)return'30 min';if(mins===45)return'45 min';if(mins===60)return'1 hour';return mins+' min';}
-function schPrevDay(){schCurrentDate.setDate(schCurrentDate.getDate()-1);renderScheduler();}
-function schNextDay(){schCurrentDate.setDate(schCurrentDate.getDate()+1);renderScheduler();}
-
-function renderScheduler(){
-  document.getElementById('sch-date-display').textContent=schFmtDate(schCurrentDate);
-  const qd=document.getElementById('sch-quick-dates');qd.innerHTML='';
-  const today=new Date();today.setHours(0,0,0,0);
-  for(let i=0;i<7;i++){
-    const d=new Date(today);d.setDate(today.getDate()+i);
-    const btn=document.createElement('button');btn.className='sch-qd';btn.textContent=schFmtShort(d);
-    if(schDateKey(d)===schDateKey(schCurrentDate))btn.classList.add('active');
-    btn.onclick=()=>{schCurrentDate=new Date(d);renderScheduler();};
-    qd.appendChild(btn);
-  }
-  const tbody=document.getElementById('sch-table-body');
-  const dateKey=schDateKey(schCurrentDate);
-  tbody.innerHTML=SCH_TIMES.map(time=>{
-    const r1=getSlotStatus(dateKey,time,'Room 1');const r2=getSlotStatus(dateKey,time,'Room 2');
-    return`<tr><td>${fmtSchTime(time)}</td><td>${renderSlot(dateKey,time,'Room 1',r1)}</td><td>${renderSlot(dateKey,time,'Room 2',r2)}</td></tr>`;
+function render(){
+  if(!session)return;
+  const isMgr=session.role==='manager';
+  const today=nowEST().date;
+  $('date-display').textContent=fmtLong(curDate);
+  let q='';for(let i=0;i<7;i++){const k=addDays(today,i);q+='<button class="qd'+(k===curDate?' active':'')+'" onclick="gotoDate(\''+k+'\')">'+fmtQuick(k)+'</button>';}
+  $('quick').innerHTML=q;
+  const occ=buildOcc();
+  $('grid-body').innerHTML=TIMES.map(function(t){
+    return '<tr><td class="tcell">'+fmtTime(t)+'</td>'+ROOMS.map(function(r){return '<td>'+cell(curDate,t,r,occ,isMgr)+'</td>';}).join('')+'</tr>';
   }).join('');
-  const mgrSection = document.getElementById('sch-mgr-section');
-  if(isManager){
-    mgrSection.style.display='block';
-    mgrSection.style.setProperty('display','block','important');
-    renderManagerApprovals();
-  } else {
-    mgrSection.style.display='none';
-  }
+  $('mgr-section').style.display=isMgr?'block':'none';
+  $('my-section').style.display=isMgr?'none':'block';
+  if(isMgr)renderManager();else renderMine();
 }
 
-function getSlotStatus(dateKey,time,room){
-  const b=schBookings.find(b=>b.date===dateKey&&b.time===time&&b.room===room);
-  if(!b)return'available';return b.status;
+function gotoDate(k){curDate=k;render();}
+function shiftDay(n){
+  const next=addDays(curDate,n);
+  if(session.role!=='manager'&&next<nowEST().date)return;
+  curDate=next;render();
 }
 
-function renderSlot(dateKey,time,room,status){
-  if(status==='available'){return`<button class="sch-slot available" onclick="openBookingModal('${dateKey}','${time}','${room}')">Available</button>`;}
-  const booking=schBookings.find(b=>b.date===dateKey&&b.time===time&&b.room===room);
-  const label=status==='pending'?`${booking?booking.name:'Pending'}`:(booking?`${booking.name}${booking.round?' · '+booking.round:''}`:'Booked');
-  return`<button class="sch-slot ${status==='pending'?'pending':'booked'}" disabled>${label}</button>`;
+function renderMine(){
+  const today=nowEST().date;
+  const mine=bookings.filter(function(b){return b.createdBy===session.username&&b.date>=today;}).sort(cmp);
+  $('my-sub').textContent=mine.length?mine.length+' upcoming booking'+(mine.length!==1?'s':''):'';
+  $('my-list').innerHTML=mine.length?mine.map(function(b){
+    const pend=b.status==='pending';
+    return '<div class="mine"><div class="l"><span class="t">'+esc(b.name)+'</span><span class="d"><span>📅 '+fmtShort(b.date)+'</span><span>⏰ '+fmtTime(b.time)+' ('+fmtDur(b.duration)+')</span><span class="pill pill-round">'+esc(b.round)+'</span><span class="pill pill-room">'+esc(b.room)+'</span><span class="pill '+(pend?'pill-pending':'pill-conf')+'">'+(pend?'Pending approval':'Confirmed')+'</span></span></div>'
+      +(pend?'<button class="btn-no" onclick="removeBooking(\''+b.id+'\',true)">✕ Cancel request</button>':'<span class="hint">To change or cancel, contact your admin</span>')+'</div>';
+  }).join(''):'<div class="empty">You have no upcoming bookings.</div>';
 }
 
-function openBookingModal(date,time,room){
-  schSelectedSlot={date,time,room};schSelectedDuration=30;
-  document.getElementById('sch-modal-info').textContent=`${room} · ${fmtSchTime(time)} · ${fmtSchDate(date)}`;
-  document.getElementById('sch-book-name').value=candidateName||'';
-  document.getElementById('sch-book-name').readOnly=true;
-  document.getElementById('sch-book-name').style.background='#eff6ff';
-  document.getElementById('sch-book-name').style.color='#2563eb';
-  document.getElementById('sch-book-round').value='';
-  document.getElementById('sch-book-err').style.display='none';
-  const timeIdx=SCH_TIMES.indexOf(time);const slotsLeft=SCH_TIMES.length-timeIdx;
-  const dur30=document.getElementById('dur-30');const dur45=document.getElementById('dur-45');const dur60=document.getElementById('dur-60');
-  dur30.disabled=slotsLeft<1;dur45.disabled=slotsLeft<2;dur60.disabled=slotsLeft<2;
-  dur30.style.opacity=slotsLeft<1?'0.4':'1';dur45.style.opacity=slotsLeft<2?'0.4':'1';dur60.style.opacity=slotsLeft<2?'0.4':'1';
-  ['30','45','60'].forEach(d=>{document.getElementById('dur-'+d).classList.toggle('active',d==='30');});
-  document.getElementById('sch-booking-modal').style.display='flex';
+function renderManager(){
+  const wk=weekRange(nowEST().date);
+  const pending=bookings.filter(function(b){return b.status==='pending';}).sort(cmp);
+  const confirmed=bookings.filter(function(b){return b.status==='confirmed'&&b.date>=wk.mon&&b.date<=wk.sun;}).sort(function(a,b){return cmp(b,a);});
+  $('pending-sub').textContent=pending.length+' booking'+(pending.length!==1?'s':'')+' awaiting approval';
+  $('confirmed-sub').textContent=confirmed.length+' confirmed interview'+(confirmed.length!==1?'s':'')+' this week';
+  $('pending-list').innerHTML=pending.length?pending.map(function(b){
+    return '<div class="pend"><div><div class="nm">👤 '+esc(b.name)+'</div><div class="dt"><span>📅 '+fmtLong(b.date)+'</span><span>⏰ '+fmtTime(b.time)+' ('+fmtDur(b.duration)+')</span><span>🎯 '+esc(b.round)+'</span><span>🚪 '+esc(b.room)+'</span></div></div>'
+      +'<div class="acts"><button class="btn-ok" onclick="approve(\''+b.id+'\')">✓ Approve</button><button class="btn-no" onclick="removeBooking(\''+b.id+'\',false)">✕ Reject</button></div></div>';
+  }).join(''):'<div class="empty">No pending bookings.</div>';
+  $('confirmed-list').innerHTML=confirmed.length?'<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Candidate</th><th>Date</th><th>Time</th><th>Duration</th><th>Round</th><th>Room</th><th>Action</th></tr></thead><tbody>'
+    +confirmed.map(function(b){
+      return '<tr><td style="font-weight:600">'+esc(b.name)+'</td><td>'+fmtLong(b.date)+'</td><td>'+fmtTime(b.time)+'</td><td>'+fmtDur(b.duration)+'</td><td><span class="pill pill-round">'+esc(b.round)+'</span></td><td><span class="pill pill-room">'+esc(b.room)+'</span></td><td><button class="btn-cancel-o" onclick="removeBooking(\''+b.id+'\',false,true)">✕ Cancel</button></td></tr>';
+    }).join('')+'</tbody></table></div>':'<div class="empty">No confirmed interviews this week.</div>';
 }
 
-function closeBookingModal(){document.getElementById('sch-booking-modal').style.display='none';schSelectedSlot=null;}
-
-function toggleNameEdit(){
-  const input=document.getElementById('sch-book-name');const btn=document.getElementById('sch-name-edit-btn');
-  if(input.readOnly){input.readOnly=false;input.style.background='#fff';input.style.color='#1a1d23';input.focus();btn.textContent='✓ Lock';btn.style.color='#2563eb';}
-  else{input.readOnly=true;input.style.background='#eff6ff';input.style.color='#2563eb';btn.textContent='✏️ Edit';btn.style.color='#64748b';}
+/* ---------- booking modal ---------- */
+function fits(date,time,room,dur,occ){
+  const i=TIMES.indexOf(time),need=slotsNeeded(dur),s=TIMES.slice(i,i+need);
+  return s.length===need&&s.every(function(t){return !occ[date+'|'+room+'|'+t];});
 }
 
-function setDuration(mins){
-  schSelectedDuration=mins;
-  ['30','45','60'].forEach(d=>{document.getElementById('dur-'+d).classList.toggle('active',String(d)===String(mins));});
+function openBooking(date,time,room){
+  slot={date:date,time:time,room:room};duration=30;
+  $('b-info').textContent=room+' · '+fmtTime(time)+' · '+fmtLong(date);
+  const n=$('b-name');n.value=session.name;n.readOnly=true;n.style.background='#eff6ff';n.style.color='#2563eb';
+  $('b-name-btn').textContent='✏️ Edit';
+  $('b-round').innerHTML='<option value="">Select round...</option>'+ROUNDS.map(function(r){return '<option value="'+r+'">'+r+'</option>';}).join('');
+  $('b-err').style.display='none';
+  const occ=buildOcc();
+  [30,45,60].forEach(function(d){const b=$('dur-'+d);b.disabled=!fits(date,time,room,d,occ);b.classList.toggle('active',d===30);});
+  $('booking-modal').style.display='flex';
 }
-
-function confirmBooking(){
-  const name=document.getElementById('sch-book-name').value.trim();
-  const round=document.getElementById('sch-book-round').value;
-  const errEl=document.getElementById('sch-book-err');
-  if(!name){errEl.textContent='Name is required.';errEl.style.display='block';return;}
-  if(!round){errEl.textContent='Please select an interview round.';errEl.style.display='block';return;}
-  errEl.style.display='none';
-  const slotsNeeded=schSelectedDuration===45?2:schSelectedDuration/30;
-  const timeIdx=SCH_TIMES.indexOf(schSelectedSlot.time);
-  for(let i=0;i<slotsNeeded;i++){
-    if(timeIdx+i>=SCH_TIMES.length){showToast('Not enough time slots for selected duration',true);return;}
-    if(getSlotStatus(schSelectedSlot.date,SCH_TIMES[timeIdx+i],schSelectedSlot.room)!=='available'){showToast('One or more slots not available',true);return;}
-  }
-  const bookingId=Date.now();
-  for(let i=0;i<slotsNeeded;i++){
-    schBookings.push({id:bookingId,date:schSelectedSlot.date,time:SCH_TIMES[timeIdx+i],room:schSelectedSlot.room,name:name.toUpperCase(),round,duration:schSelectedDuration,isFirst:i===0,status:'pending'});
-  }
-  saveSchBookings();closeBookingModal();renderScheduler();showToast('✓ Booking submitted — awaiting manager approval');
+function closeBooking(){$('booking-modal').style.display='none';slot=null;}
+function setDur(d){if($('dur-'+d).disabled)return;duration=d;[30,45,60].forEach(function(x){$('dur-'+x).classList.toggle('active',x===d);});}
+function toggleName(){
+  const n=$('b-name'),b=$('b-name-btn');
+  if(n.readOnly){n.readOnly=false;n.style.background='#fff';n.style.color='#1a1d23';n.focus();b.textContent='✓ Lock';}
+  else{n.readOnly=true;n.style.background='#eff6ff';n.style.color='#2563eb';b.textContent='✏️ Edit';}
 }
+function bErr(m){const e=$('b-err');e.textContent=m;e.style.display='block';}
 
-function renderManagerApprovals(){
-  const pending=schBookings.filter(b=>b.status==='pending'&&b.isFirst);
-  const todayD=new Date();todayD.setHours(0,0,0,0);
-  const dayOfWeek=todayD.getDay();
-  const weekMon=new Date(todayD);weekMon.setDate(todayD.getDate()-(dayOfWeek===0?6:dayOfWeek-1));
-  const weekSun=new Date(weekMon);weekSun.setDate(weekMon.getDate()+6);
-  const weekMonKey=schDateKey(weekMon);const weekSunKey=schDateKey(weekSun);
-  const confirmed=schBookings.filter(b=>b.status==='confirmed'&&b.isFirst&&b.date>=weekMonKey&&b.date<=weekSunKey).sort((a,b)=>b.date>a.date?1:b.date<a.date?-1:b.time>a.time?1:-1);
-  document.getElementById('pending-count').textContent=`${pending.length} booking${pending.length!==1?'s':''} awaiting approval`;
-  document.getElementById('confirmed-count').textContent=`${confirmed.length} confirmed interview${confirmed.length!==1?'s':''} this week`;
-  const pendingList=document.getElementById('pending-list');
-  if(!pending.length){pendingList.innerHTML='<div class="sch-empty">No pending bookings.</div>';}
-  else{pendingList.innerHTML=pending.map(b=>`<div class="sch-pending-item">
-    <div class="sch-pending-item-info">
-      <div class="sch-pending-name">👤 ${b.name}</div>
-      <div class="sch-pending-detail">
-        <span>📅 ${fmtSchDate(b.date)}</span>
-        <span>⏰ ${fmtSchTime(b.time)} (${fmtDuration(b.duration)})</span>
-        <span>🎯 ${b.round||'—'}</span>
-        <span>🚪 ${b.room}</span>
-      </div>
-    </div>
-    <div class="sch-pending-actions">
-      <button class="btn-approve" onclick="approveBooking(${b.id})">✓ Approve</button>
-      <button class="btn-reject" onclick="rejectBooking(${b.id})">✕ Reject</button>
-    </div>
-  </div>`).join('');}
-  const confirmedList=document.getElementById('confirmed-list');
-  if(!confirmed.length){confirmedList.innerHTML='<div class="sch-empty">No confirmed interviews this week.</div>';}
-  else{confirmedList.innerHTML=`<table class="sch-confirmed-table"><thead><tr><th>Candidate</th><th>Date</th><th>Time</th><th>Duration</th><th>Round</th><th>Room</th><th>Action</th></tr></thead><tbody>
-    ${confirmed.map(b=>`<tr>
-      <td class="td-name">${b.name}</td>
-      <td>${fmtSchDate(b.date)}</td>
-      <td>${fmtSchTime(b.time)}</td>
-      <td>${fmtDuration(b.duration)}</td>
-      <td><span class="sch-room-badge" style="background:#f5f3ff;color:#7c3aed;border-color:#ddd6fe;">${b.round||'—'}</span></td>
-      <td><span class="sch-room-badge">${b.room}</span></td>
-      <td><button class="btn-reject" onclick="cancelBooking(${b.id})" style="background:#fff7ed;color:#ea580c;border-color:#fed7aa;font-size:11px;padding:5px 10px;">✕ Cancel</button></td>
-    </tr>`).join('')}
-  </tbody></table>`;}
-}
-
-function approveBooking(id){schBookings.filter(b=>b.id===id).forEach(b=>b.status='confirmed');saveSchBookings();renderScheduler();showToast('✓ Booking approved!');}
-function rejectBooking(id){if(confirm('Reject this booking?')){schBookings=schBookings.filter(b=>b.id!==id);saveSchBookings();renderScheduler();showToast('Booking rejected');}}
-function cancelBooking(id){if(confirm('Cancel this confirmed booking?\n\nThe slot will be freed up for other candidates.')){schBookings=schBookings.filter(b=>b.id!==id);saveSchBookings();renderScheduler();showToast('✓ Booking cancelled — slot is now available');}}
-
-
-
-// ===== REGISTRATION =====
-let pendingRegistrations = JSON.parse(localStorage.getItem('vct_pending_regs') || '[]');
-function savePendingRegs(){localStorage.setItem('vct_pending_regs', JSON.stringify(pendingRegistrations));}
-
-function showRegister(){
-  document.getElementById('login-screen').classList.remove('show');
-  document.getElementById('register-screen').classList.add('show');
-  document.getElementById('reg-name').value='';
-  document.getElementById('reg-username').value='';
-  document.getElementById('reg-password').value='';
-  document.getElementById('reg-confirm').value='';
-  document.getElementById('reg-err').style.display='none';
-}
-
-function showLogin(){
-  document.getElementById('register-screen').classList.remove('show');
-  document.getElementById('reg-success-screen').classList.remove('show');
-  document.getElementById('login-screen').classList.add('show');
-}
-
-async function doRegister(){
-  const name = document.getElementById('reg-name').value.trim().toUpperCase();
-  const username = document.getElementById('reg-username').value.trim().toUpperCase();
-  const password = document.getElementById('reg-password').value;
-  const confirm = document.getElementById('reg-confirm').value;
-  const errEl = document.getElementById('reg-err');
-  const btn = document.getElementById('reg-btn');
-  errEl.style.display='none';
-
-  if(!name){errEl.textContent='Full name is required.';errEl.style.display='block';return;}
-  if(!username){errEl.textContent='Username is required.';errEl.style.display='block';return;}
-  if(!password||password.length<4){errEl.textContent='Password must be at least 4 characters.';errEl.style.display='block';return;}
-  if(password!==confirm){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
-
-  // Load latest credentials to check duplicates
-  btn.disabled=true;btn.textContent='Submitting...';
+async function submitBooking(){
+  if(submitting||!slot)return;
+  const name=$('b-name').value.trim().toUpperCase(),round=$('b-round').value;
+  if(!name){bErr('Name is required.');return;}
+  if(!round){bErr('Please select an interview round.');return;}
+  if(!fits(slot.date,slot.time,slot.room,duration,buildOcc())){bErr('That duration no longer fits. Pick another.');return;}
+  submitting=true;const btn=$('b-submit');btn.disabled=true;btn.textContent='Saving...';
+  const b={id:'B'+Date.now()+Math.floor(Math.random()*1000),date:slot.date,time:slot.time,room:slot.room,name:name,round:round,duration:duration,status:'pending',createdBy:session.username};
   try{
-    await loadCredentialsFromSheet();
-    if(credentials.some(c=>c.username.toUpperCase()===username.toUpperCase())){
-      errEl.textContent='Username already taken. Please choose another.';errEl.style.display='block';
-      btn.disabled=false;btn.textContent='Submit Registration';return;
-    }
-    if(pendingRegistrations.some(r=>r.username.toUpperCase()===username.toUpperCase())){
-      errEl.textContent='This username already has a pending request.';errEl.style.display='block';
-      btn.disabled=false;btn.textContent='Submit Registration';return;
-    }
-    pendingRegistrations.push({candidateName:name, username, password, submittedAt:new Date().toISOString()});
-    savePendingRegs();
-    document.getElementById('register-screen').classList.remove('show');
-    document.getElementById('reg-success-screen').classList.add('show');
-  }catch(e){
-    errEl.textContent='Connection error. Please try again.';errEl.style.display='block';
-  }finally{btn.disabled=false;btn.textContent='Submit Registration';}
+    const r=await apiPost(Object.assign({action:'addBooking'},b));
+    if(r.status==='ok'){bookings.push(b);closeBooking();render();toast('✓ Request sent — awaiting manager approval');}
+    else if(r.status==='conflict'){closeBooking();toast('Someone just booked that slot. Please pick another.',true);await loadBookings(true);render();}
+    else throw new Error(r.status);
+  }catch(e){bErr('Could not save. Please try again.');}
+  finally{submitting=false;btn.disabled=false;btn.textContent='Request Booking';}
 }
 
-function renderPendingRegistrations(){
-  const section = document.getElementById('pending-reg-section');
-  const list = document.getElementById('pending-reg-list');
-  const count = document.getElementById('pending-reg-count');
-
-  if(!pendingRegistrations.length){
-    section.style.display='none';return;
-  }
-  section.style.display='block';
-  count.textContent = pendingRegistrations.length + ' pending';
-  list.innerHTML = pendingRegistrations.map((r,i)=>`
-    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <div style="display:flex;flex-direction:column;gap:3px;">
-        <span style="font-size:13px;font-weight:600;color:#1a1d23;">${r.candidateName}</span>
-        <span style="font-size:11px;color:#94a3b8;font-family:JetBrains Mono,monospace;">@${r.username} · ${'•'.repeat(r.password.length)}</span>
-        <span style="font-size:11px;color:#d97706;">${new Date(r.submittedAt).toLocaleDateString()}</span>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button onclick="approveRegistration(${i})" style="background:#059669;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">✓ Approve</button>
-        <button onclick="rejectRegistration(${i})" style="background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">✕ Reject</button>
-      </div>
-    </div>`).join('');
-}
-
-async function approveRegistration(i){
-  const reg = pendingRegistrations[i];
-  credentials.push({candidateName:reg.candidateName, username:reg.username, password:reg.password});
-  await saveCredentialsToSheet();
-  pendingRegistrations.splice(i,1);
-  savePendingRegs();
-  renderPendingRegistrations();
-  renderLoginList();
-  showToast('✓ '+reg.candidateName+' approved!');
-}
-
-function rejectRegistration(i){
-  const name = pendingRegistrations[i].candidateName;
-  if(confirm('Reject registration for "'+name+'"?')){
-    pendingRegistrations.splice(i,1);
-    savePendingRegs();
-    renderPendingRegistrations();
-    showToast('Registration rejected for '+name);
-  }
-}
-
-// ===== CANDIDATE PASSWORD CHANGE =====
-function openChangePwModal(){
-  document.getElementById('cand-pw-current').value='';
-  document.getElementById('cand-pw-new').value='';
-  document.getElementById('cand-pw-confirm').value='';
-  document.getElementById('cand-pw-error').style.display='none';
-  document.getElementById('candidate-pw-modal').style.display='flex';
-  setTimeout(()=>document.getElementById('cand-pw-current').focus(),100);
-}
-function closeChangePwModal(){document.getElementById('candidate-pw-modal').style.display='none';}
-
-async function saveCandidatePassword(){
-  const current=document.getElementById('cand-pw-current').value;
-  const newPw=document.getElementById('cand-pw-new').value;
-  const confirm=document.getElementById('cand-pw-confirm').value;
-  const errEl=document.getElementById('cand-pw-error');
-  const btn=document.getElementById('cand-pw-save-btn');
-  errEl.style.display='none';
-
-  // Validate current password
-  const user=credentials.find(c=>c.candidateName.toUpperCase()===candidateName.toUpperCase());
-  if(!user){errEl.textContent='Could not find your account.';errEl.style.display='block';return;}
-  if(current!==user.password){errEl.textContent='Current password is incorrect.';errEl.style.display='block';return;}
-  if(!newPw||newPw.length<4){errEl.textContent='New password must be at least 4 characters.';errEl.style.display='block';return;}
-  if(newPw!==confirm){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
-  if(newPw===current){errEl.textContent='New password must be different from current.';errEl.style.display='block';return;}
-
-  btn.disabled=true;btn.textContent='Updating...';
-  // Update in credentials array
-  user.password=newPw;
-  if(loggedInUser)loggedInUser.password=newPw;
+/* ---------- manager / cancel actions ---------- */
+async function act(payload,after,okMsg){
+  setSync('loading','Saving...');
   try{
-    await saveCredentialsToSheet();
-    closeChangePwModal();
-    showToast('✓ Password updated successfully!');
-  }catch(e){
-    errEl.textContent='Failed to save. Please try again.';errEl.style.display='block';
-  }finally{btn.disabled=false;btn.textContent='Update Password';}
+    const r=await apiPost(payload);
+    if(r.status==='ok'||r.status==='not_found'){after();setSync('ok','✓ Live');render();toast(okMsg);return;}
+    throw new Error(r.status);
+  }catch(e){setSync('err','✗ Failed');toast('Action failed. Please try again.',true);}
+}
+function approve(id){
+  act({action:'updateBookingStatus',id:id,status:'confirmed'},function(){bookings.forEach(function(b){if(b.id===id)b.status='confirmed';});},'✓ Booking approved');
+}
+function removeBooking(id,mine,confirmedOne){
+  const msg=mine?'Cancel this booking request?':(confirmedOne?'Cancel this confirmed interview?\n\nThe slot will be freed for other candidates.':'Reject this booking?');
+  if(!confirm(msg))return;
+  act({action:'deleteBooking',id:id},function(){bookings=bookings.filter(function(b){return b.id!==id;});},mine?'Request cancelled':(confirmedOne?'✓ Cancelled — slot is available again':'Booking rejected'));
 }
 
-// ===== INIT =====
+/* ---------- init ---------- */
 async function init(){
-  populateDL('f-dl');populateDL('e-dl');
-
-  // Check if session exists
-  const savedName = localStorage.getItem('vct_candidate_name');
-  const savedIsManager = localStorage.getItem('vct_is_manager') === 'true';
-
-  if(savedIsManager){
-    // Restore manager session
-    localStorage.setItem('vct_is_manager','true');
-    document.getElementById('login-screen').classList.remove('show');
-    document.getElementById('main-app').style.display='block';
-    document.getElementById('app-nav').classList.add('show');
-    isManager=true;
-    document.getElementById('manager-banner').style.display='flex';
-    document.getElementById('form-section').style.display='none';
-    document.getElementById('manager-btn').classList.add('active');
-    document.getElementById('th-candidate').style.display='';
-    document.getElementById('filter-candidate').style.display='';
-    showLoading('Loading all data...');
-    try{
-      entries=rowsToEntries(await fetchFromSheet());
-      await loadCredentialsFromSheet();
-      setSyncStatus('ok','✓ Live');hideLoading();
-      populateCandidateFilter();updateHeaderName();renderTable();updateStats();
-    }catch(e){setSyncStatus('err','✗ Offline');hideLoading();}
-    return;
+  const raw=localStorage.getItem('sch_session');
+  if(raw){
+    let s=null;try{s=JSON.parse(raw);}catch(e){}
+    if(s){
+      try{
+        if(s.role==='manager'){session={role:'manager'};}
+        else{
+          await loadCredentials();
+          const c=credentials.find(function(x){return x.username===s.username;});
+          if(c)session={role:'candidate',username:c.username,name:c.candidateName};
+          else localStorage.removeItem('sch_session');
+        }
+        if(session){await startApp();return;}
+      }catch(e){}
+    }
   }
-
-  if(savedName){
-    // Restore candidate session
-    showLoading('Loading credentials...');
-    try{
-      await loadCredentialsFromSheet();
-      const user=credentials.find(c=>c.username.toUpperCase()===(localStorage.getItem('vct_username')||'').toUpperCase());
-      if(user){
-        loggedInUser=user;
-        candidateName=savedName;
-        document.getElementById('login-screen').classList.remove('show');
-        document.getElementById('main-app').style.display='block';
-        document.getElementById('app-nav').classList.add('show');
-        document.getElementById('f-candidate').value=candidateName;
-        document.getElementById('candidate-export-btn').style.display='flex';
-        document.getElementById('change-pw-btn').style.display='flex';
-        updateHeaderName();
-        entries=rowsToEntries(await fetchFromSheet());
-        setSyncStatus('ok','✓ Live');hideLoading();
-        renderTable();updateStats();
-        return;
-      }
-    }catch(e){hideLoading();}
-    // Clear invalid session
-    localStorage.removeItem('vct_candidate_name');
-    localStorage.removeItem('vct_username');
-  }
-
-  // No session - show login screen
-  hideLoading();
-  document.getElementById('login-screen').classList.add('show');
-  document.getElementById('main-app').style.display='none';
+  showLoading(false);
+  $('login-screen').classList.add('show');
 }
-
 init();
 </script>
 </body>
