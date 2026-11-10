@@ -32,6 +32,20 @@ td{padding:10px 12px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
 tr:hover td{background:#f8fafc}
 .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#eff6ff;color:#2563eb}
 .cnt{font-size:13px;color:#64748b}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+@keyframes flash{0%{background:#fef08a}100%{background:transparent}}
+tr.new td{animation:flash 4s ease-out}
+.live{display:inline-flex;align-items:center;gap:7px;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px}
+.live i{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.6s infinite}
+.live.off{background:#fef2f2;border-color:#fecaca;color:#dc2626}.live.off i{background:#dc2626;animation:none}
+.upd{font-size:12px;color:#94a3b8;margin-left:8px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.st{border-radius:10px;padding:14px 16px;color:#fff}
+.st b{display:block;font-size:26px;line-height:1.1}.st span{font-size:12px;opacity:.9;font-weight:500}
+.s1{background:linear-gradient(135deg,#2563eb,#4f46e5)}.s2{background:linear-gradient(135deg,#059669,#10b981)}.s3{background:linear-gradient(135deg,#d97706,#f59e0b)}.s4{background:linear-gradient(135deg,#7c3aed,#a855f7)}
+.pill.p-sub{background:#eff6ff;color:#2563eb}.pill.p-int{background:#f5f3ff;color:#7c3aed}.pill.p-doc{background:#f0f9ff;color:#0284c7}.pill.p-wait{background:#fffbeb;color:#d97706}.pill.p-rej{background:#fef2f2;color:#dc2626}.pill.p-hold{background:#f1f5f9;color:#64748b}
+.toastm{position:fixed;bottom:20px;right:20px;background:#16a34a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.2);display:none;z-index:50}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.g{grid-template-columns:1fr}.full{grid-column:span 1}}
 </style></head><body>
 <div class="wrap" id="wrap">
@@ -43,13 +57,16 @@ tr:hover td{background:#f8fafc}
   <button class="btn" id="lb" onclick="doLogin()">Login</button>
 </div>
 <div id="mgr">
-  <div class="top"><span style="font-size:13px;color:#64748b"><b style="color:#2563eb">MANAGER</b> &middot; All submissions</span><span><button class="lo" style="border-color:#bfdbfe;color:#2563eb;margin-right:6px" onclick="loadAll()">&#8635; Refresh</button><button class="lo" onclick="logout()">Logout</button></span></div>
+  <div class="top"><span style="font-size:13px;color:#64748b"><b style="color:#2563eb">MANAGER</b> &middot; All submissions <span class="live" id="live"><i></i>LIVE</span><span class="upd" id="upd"></span></span><span><button class="lo" style="border-color:#bfdbfe;color:#2563eb;margin-right:6px" onclick="loadAll()">&#8635; Refresh</button><button class="lo" onclick="logout()">Logout</button></span></div>
   <div class="box">
-    <h1>Submissions</h1><div class="cnt" id="mcount"></div>
+    <h1>Submissions</h1>
+    <div class="stats"><div class="st s1"><b id="k1">0</b><span>Total submissions</span></div><div class="st s2"><b id="k2">0</b><span>Today</span></div><div class="st s3"><b id="k3">0</b><span>Last 7 days</span></div><div class="st s4"><b id="k4">0</b><span>Interviews</span></div></div>
+    <div class="cnt" id="mcount"></div>
     <div class="fl"><input id="mq" placeholder="Search vendor, client, company, position..." oninput="renderAll()"><select id="mc" onchange="renderAll()"></select><select id="ms" onchange="renderAll()"><option value="">All statuses</option><option>Documents Sent</option><option>Submitted</option><option>Interview Scheduled</option><option>Interview Done</option><option>Awaiting Feedback</option><option>Rejected</option><option>On Hold</option><option>No Response</option></select></div>
     <div class="tw"><table><thead><tr><th>Date</th><th>Candidate</th><th>Vendor</th><th>Phone</th><th>Email</th><th>Vendor Company</th><th>Impl Partner</th><th>Client</th><th>Position</th><th>Location</th><th>DL</th><th>India RM</th><th>My Location</th><th>Status</th><th>Comments</th></tr></thead><tbody id="mbody"></tbody></table></div>
   </div>
 </div>
+<div class="toastm" id="tm"></div>
 <div id="app" style="display:none">
   <div class="top"><span style="font-size:13px;color:#64748b">Logged in as <b id="who" style="color:#2563eb"></b></span><button class="lo" onclick="logout()">Logout</button></div>
   <div class="box">
@@ -100,21 +117,25 @@ async function doLogin(){
   }catch(e){msg('le','Connection error. Try again.');}
   finally{b.disabled=false;b.textContent='Login';}
 }
-let allRows=[];
+let allRows=[],knownIds=null,newIds={},liveTimer=null;
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function dstr(v){v=String(v||'');return v.length>10&&v.indexOf('T')>0?v.slice(0,10):v;}
 async function loadAll(){
   try{
     const r=await fetch(SHEET_URL+'?t='+Date.now());const d=await r.json();
     allRows=(d.rows||[]).slice(1).filter(function(x){return x[0]!==''&&x[0]!=null;}).map(function(x){return {id:String(x[0]),cand:String(x[1]),date:dstr(x[2]),vendor:x[3],phone:x[4],email:x[5],comp:x[6],impl:x[7],client:x[8],pos:x[9],loc:x[10],dl:x[11],india:x[12],myloc:x[13],status:x[14],comm:x[15]};});
+    if(knownIds){const fresh=allRows.filter(function(x){return !knownIds.has(x.id);});if(fresh.length){fresh.forEach(function(x){newIds[x.id]=1;});setTimeout(function(){newIds={};},4500);const t=$('tm');t.textContent='\uD83D\uDD14 '+fresh.length+' new submission'+(fresh.length>1?'s':'');t.style.display='block';setTimeout(function(){t.style.display='none';},4000);}}
+    knownIds=new Set(allRows.map(function(x){return x.id;}));
+    $('live').className='live';$('live').lastChild.textContent='LIVE';$('upd').textContent='Updated '+new Date().toLocaleTimeString();
     allRows.sort(function(a,b){return a.date===b.date?(Number(b.id)||0)-(Number(a.id)||0):(a.date<b.date?1:-1);});
     const names=Array.from(new Set(allRows.map(function(x){return x.cand;}))).sort();
     const cur=$('mc').value;
     $('mc').innerHTML='<option value="">All candidates</option>'+names.map(function(n){return '<option>'+esc(n)+'</option>';}).join('');
     $('mc').value=cur;
     renderAll();
-  }catch(e){$('mcount').textContent='Could not load submissions.';}
+  }catch(e){$('live').className='live off';$('live').lastChild.textContent='OFFLINE';}
 }
+function pc(s){s=String(s).toLowerCase();return s.indexOf('interview')>=0?'p-int':s==='submitted'?'p-sub':s==='documents sent'?'p-doc':s==='awaiting feedback'?'p-wait':s==='rejected'?'p-rej':'p-hold';}
 function renderAll(){
   const q=$('mq').value.trim().toLowerCase(),c=$('mc').value,s=$('ms').value.toLowerCase();
   const rows=allRows.filter(function(x){
@@ -123,16 +144,21 @@ function renderAll(){
     if(q&&[x.vendor,x.comp,x.impl,x.client,x.pos,x.loc,x.comm,x.email,x.phone].join(' ').toLowerCase().indexOf(q)<0)return false;
     return true;
   });
+  const td=new Date(),ymd=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+  const wk=new Date(td);wk.setDate(wk.getDate()-6);
+  $('k1').textContent=allRows.length;$('k2').textContent=allRows.filter(function(x){return x.date===ymd(td);}).length;
+  $('k3').textContent=allRows.filter(function(x){return x.date>=ymd(wk)&&x.date<=ymd(td);}).length;
+  $('k4').textContent=allRows.filter(function(x){return String(x.status||'').toLowerCase().indexOf('interview')>=0;}).length;
   $('mcount').textContent=rows.length+' of '+allRows.length+' submissions';
   $('mbody').innerHTML=rows.length?rows.map(function(x){
-    return '<tr><td>'+esc(x.date)+'</td><td><b>'+esc(x.cand)+'</b></td><td>'+esc(x.vendor)+'</td><td>'+esc(x.phone)+'</td><td>'+esc(x.email)+'</td><td>'+esc(x.comp)+'</td><td>'+esc(x.impl)+'</td><td>'+esc(x.client)+'</td><td>'+esc(x.pos)+'</td><td>'+esc(x.loc)+'</td><td>'+esc(x.dl)+'</td><td>'+esc(x.india)+'</td><td>'+esc(x.myloc)+'</td><td>'+(x.status?'<span class="pill">'+esc(x.status)+'</span>':'')+'</td><td>'+esc(x.comm)+'</td></tr>';
+    return '<tr'+(newIds[x.id]?' class="new"':'')+'><td>'+esc(x.date)+'</td><td><b>'+esc(x.cand)+'</b></td><td>'+esc(x.vendor)+'</td><td>'+esc(x.phone)+'</td><td>'+esc(x.email)+'</td><td>'+esc(x.comp)+'</td><td>'+esc(x.impl)+'</td><td>'+esc(x.client)+'</td><td>'+esc(x.pos)+'</td><td>'+esc(x.loc)+'</td><td>'+esc(x.dl)+'</td><td>'+esc(x.india)+'</td><td>'+esc(x.myloc)+'</td><td>'+(x.status?'<span class="pill '+pc(x.status)+'">'+esc(x.status)+'</span>':'')+'</td><td>'+esc(x.comm)+'</td></tr>';
   }).join(''):'<tr><td colspan="15" style="text-align:center;color:#94a3b8;padding:24px">No submissions found.</td></tr>';
 }
 function show(){
   $('login').style.display='none';
-  if(me.u==='MANAGER'){$('wrap').style.maxWidth='1240px';$('mgr').style.display='block';loadAll();return;}
+  if(me.u==='MANAGER'){$('wrap').style.maxWidth='1240px';$('mgr').style.display='block';loadAll();clearInterval(liveTimer);liveTimer=setInterval(function(){if(!document.hidden)loadAll();},15000);return;}
   $('wrap').style.maxWidth='720px';$('app').style.display='block';$('who').textContent=me.n;$('f-candidate').value=me.n;$('f-date').value=today();}
-function logout(){me=null;$('mgr').style.display='none';$('wrap').style.maxWidth='720px';localStorage.removeItem('sub_user');$('app').style.display='none';$('login').style.display='block';$('lu').value='';$('lp').value='';}
+function logout(){me=null;clearInterval(liveTimer);knownIds=null;$('mgr').style.display='none';$('wrap').style.maxWidth='720px';localStorage.removeItem('sub_user');$('app').style.display='none';$('login').style.display='block';$('lu').value='';$('lp').value='';}
 async function submitEntry(){
   if(busy||!me)return;msg('se','');$('ok').style.display='none';
   const g=id=>$(id).value.trim();
