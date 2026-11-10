@@ -22,15 +22,33 @@ input:disabled{background:#eff6ff;color:#2563eb;font-weight:600}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .lo{background:#fff;border:1px solid #fecaca;color:#dc2626;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:500}
 #login{max-width:360px;margin:12vh auto 0}
+#mgr{display:none;max-width:1200px;margin:0 auto}
+.fl{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.fl input,.fl select{width:auto;flex:1;min-width:150px}
+.tw{overflow-x:auto;border:1px solid #e2e6ea;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f8fafc;text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#64748b;white-space:nowrap;border-bottom:2px solid #e2e6ea;position:sticky;top:0}
+td{padding:10px 12px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+tr:hover td{background:#f8fafc}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#eff6ff;color:#2563eb}
+.cnt{font-size:13px;color:#64748b}
 @media(max-width:560px){.g{grid-template-columns:1fr}.full{grid-column:span 1}}
 </style></head><body>
-<div class="wrap">
+<div class="wrap" id="wrap">
 <div id="login" class="box">
   <h1 style="text-align:center;margin-bottom:22px">Submit Vendor Contact</h1>
   <div class="f" style="margin-bottom:14px"><label>Username</label><input id="lu" autocomplete="off" onkeydown="if(event.key==='Enter')lp.focus()"></div>
   <div class="f"><label>Password</label><input id="lp" type="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
   <div class="err" id="le"></div>
   <button class="btn" id="lb" onclick="doLogin()">Login</button>
+</div>
+<div id="mgr">
+  <div class="top"><span style="font-size:13px;color:#64748b"><b style="color:#2563eb">MANAGER</b> &middot; All submissions</span><span><button class="lo" style="border-color:#bfdbfe;color:#2563eb;margin-right:6px" onclick="loadAll()">&#8635; Refresh</button><button class="lo" onclick="logout()">Logout</button></span></div>
+  <div class="box">
+    <h1>Submissions</h1><div class="cnt" id="mcount"></div>
+    <div class="fl"><input id="mq" placeholder="Search vendor, client, company, position..." oninput="renderAll()"><select id="mc" onchange="renderAll()"></select><select id="ms" onchange="renderAll()"><option value="">All statuses</option><option>Documents Sent</option><option>Submitted</option><option>Interview Scheduled</option><option>Interview Done</option><option>Awaiting Feedback</option><option>Rejected</option><option>On Hold</option><option>No Response</option></select></div>
+    <div class="tw"><table><thead><tr><th>Date</th><th>Candidate</th><th>Vendor</th><th>Phone</th><th>Email</th><th>Vendor Company</th><th>Impl Partner</th><th>Client</th><th>Position</th><th>Location</th><th>DL</th><th>India RM</th><th>My Location</th><th>Status</th><th>Comments</th></tr></thead><tbody id="mbody"></tbody></table></div>
+  </div>
 </div>
 <div id="app" style="display:none">
   <div class="top"><span style="font-size:13px;color:#64748b">Logged in as <b id="who" style="color:#2563eb"></b></span><button class="lo" onclick="logout()">Logout</button></div>
@@ -82,8 +100,39 @@ async function doLogin(){
   }catch(e){msg('le','Connection error. Try again.');}
   finally{b.disabled=false;b.textContent='Login';}
 }
-function show(){$('login').style.display='none';$('app').style.display='block';$('who').textContent=me.n;$('f-candidate').value=me.n;$('f-date').value=today();}
-function logout(){me=null;localStorage.removeItem('sub_user');$('app').style.display='none';$('login').style.display='block';$('lu').value='';$('lp').value='';}
+let allRows=[];
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function dstr(v){v=String(v||'');return v.length>10&&v.indexOf('T')>0?v.slice(0,10):v;}
+async function loadAll(){
+  try{
+    const r=await fetch(SHEET_URL+'?t='+Date.now());const d=await r.json();
+    allRows=(d.rows||[]).slice(1).filter(function(x){return x[0]!==''&&x[0]!=null;}).map(function(x){return {id:String(x[0]),cand:String(x[1]),date:dstr(x[2]),vendor:x[3],phone:x[4],email:x[5],comp:x[6],impl:x[7],client:x[8],pos:x[9],loc:x[10],dl:x[11],india:x[12],myloc:x[13],status:x[14],comm:x[15]};});
+    allRows.sort(function(a,b){return a.date===b.date?(Number(b.id)||0)-(Number(a.id)||0):(a.date<b.date?1:-1);});
+    const names=Array.from(new Set(allRows.map(function(x){return x.cand;}))).sort();
+    const cur=$('mc').value;
+    $('mc').innerHTML='<option value="">All candidates</option>'+names.map(function(n){return '<option>'+esc(n)+'</option>';}).join('');
+    $('mc').value=cur;
+    renderAll();
+  }catch(e){$('mcount').textContent='Could not load submissions.';}
+}
+function renderAll(){
+  const q=$('mq').value.trim().toLowerCase(),c=$('mc').value,s=$('ms').value.toLowerCase();
+  const rows=allRows.filter(function(x){
+    if(c&&x.cand!==c)return false;
+    if(s&&String(x.status||'').toLowerCase()!==s)return false;
+    if(q&&[x.vendor,x.comp,x.impl,x.client,x.pos,x.loc,x.comm,x.email,x.phone].join(' ').toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  $('mcount').textContent=rows.length+' of '+allRows.length+' submissions';
+  $('mbody').innerHTML=rows.length?rows.map(function(x){
+    return '<tr><td>'+esc(x.date)+'</td><td><b>'+esc(x.cand)+'</b></td><td>'+esc(x.vendor)+'</td><td>'+esc(x.phone)+'</td><td>'+esc(x.email)+'</td><td>'+esc(x.comp)+'</td><td>'+esc(x.impl)+'</td><td>'+esc(x.client)+'</td><td>'+esc(x.pos)+'</td><td>'+esc(x.loc)+'</td><td>'+esc(x.dl)+'</td><td>'+esc(x.india)+'</td><td>'+esc(x.myloc)+'</td><td>'+(x.status?'<span class="pill">'+esc(x.status)+'</span>':'')+'</td><td>'+esc(x.comm)+'</td></tr>';
+  }).join(''):'<tr><td colspan="15" style="text-align:center;color:#94a3b8;padding:24px">No submissions found.</td></tr>';
+}
+function show(){
+  $('login').style.display='none';
+  if(me.u==='MANAGER'){$('wrap').style.maxWidth='1240px';$('mgr').style.display='block';loadAll();return;}
+  $('wrap').style.maxWidth='720px';$('app').style.display='block';$('who').textContent=me.n;$('f-candidate').value=me.n;$('f-date').value=today();}
+function logout(){me=null;$('mgr').style.display='none';$('wrap').style.maxWidth='720px';localStorage.removeItem('sub_user');$('app').style.display='none';$('login').style.display='block';$('lu').value='';$('lp').value='';}
 async function submitEntry(){
   if(busy||!me)return;msg('se','');$('ok').style.display='none';
   const g=id=>$(id).value.trim();
