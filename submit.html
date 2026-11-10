@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Submit Vendor Contact</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a1d23;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:24px 16px}
+.box{background:#fff;border-radius:12px;padding:28px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+h1{font-size:20px;margin-bottom:4px}.sub{font-size:13px;color:#64748b;margin-bottom:20px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:span 2}
+.f{display:flex;flex-direction:column;gap:5px}
+label{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em}
+label i{font-style:normal;font-weight:400;color:#94a3b8;text-transform:none}
+input,select{background:#f8fafc;border:1px solid #e2e6ea;border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;width:100%}
+input:focus,select:focus{border-color:#2563eb;background:#fff}
+input.up{text-transform:uppercase}
+input:disabled{background:#eff6ff;color:#2563eb;font-weight:600}
+.btn{width:100%;background:#2563eb;color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:18px}
+.btn:hover{background:#1d4ed8}.btn:disabled{opacity:.6;cursor:not-allowed}
+.err{color:#dc2626;font-size:13px;font-weight:500;margin-top:12px;display:none}
+.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;padding:12px;border-radius:8px;font-size:14px;font-weight:600;margin-bottom:16px;display:none}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.lo{background:#fff;border:1px solid #fecaca;color:#dc2626;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:500}
+#login{max-width:360px;margin:12vh auto 0}
+@media(max-width:560px){.g{grid-template-columns:1fr}.full{grid-column:span 1}}
+</style></head><body>
+<div class="wrap">
+<div id="login" class="box">
+  <h1 style="text-align:center;margin-bottom:22px">Submit Vendor Contact</h1>
+  <div class="f" style="margin-bottom:14px"><label>Username</label><input id="lu" autocomplete="off" onkeydown="if(event.key==='Enter')lp.focus()"></div>
+  <div class="f"><label>Password</label><input id="lp" type="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+  <div class="err" id="le"></div>
+  <button class="btn" id="lb" onclick="doLogin()">Login</button>
+</div>
+<div id="app" style="display:none">
+  <div class="top"><span style="font-size:13px;color:#64748b">Logged in as <b id="who" style="color:#2563eb"></b></span><button class="lo" onclick="logout()">Logout</button></div>
+  <div class="box">
+    <h1>Log new vendor contact</h1><div class="sub">Fill in the details and submit. At least Client or Vendor Name is required.</div>
+    <div class="ok" id="ok">&#10003; Submitted successfully</div>
+    <div class="g">
+      <div class="f"><label>Candidate Name</label><input id="f-candidate" disabled></div>
+      <div class="f"><label>Date</label><input type="date" id="f-date"></div>
+      <div class="f full"><label>Vendor Name</label><input class="up" id="f-vendor" placeholder="RECRUITER / VENDOR NAME"></div>
+      <div class="f"><label>Vendor Phone</label><input type="tel" id="f-phone"></div>
+      <div class="f"><label>Vendor Email <i>(optional)</i></label><input type="email" id="f-vendor-email"></div>
+      <div class="f full"><label>Vendor Company</label><input class="up" id="f-vendor-company"></div>
+      <div class="f"><label>Implementation Partner <i>(optional)</i></label><input class="up" id="f-impl-partner" placeholder="E.G. WIPRO, COGNIZANT"></div>
+      <div class="f"><label>Client <i>(optional)</i></label><input class="up" id="f-client"></div>
+      <div class="f"><label>Position / Role</label><input class="up" id="f-position"></div>
+      <div class="f"><label>Location Requested</label><input class="up" id="f-location" placeholder="CITY, STATE OR REMOTE"></div>
+      <div class="f"><label>DL Submitted (State)</label><select id="f-dl"></select></div>
+      <div class="f"><label>India Team RM</label><input class="up" id="f-india"></div>
+      <div class="f"><label>My Location</label><input class="up" id="f-mylocation"></div>
+      <div class="f"><label>Status</label><select id="f-update"><option value="">Select status</option><option>Documents Sent</option><option>Submitted</option><option>Interview Scheduled</option><option>Interview Done</option><option>Awaiting Feedback</option><option>Rejected</option><option>On Hold</option><option>No Response</option></select></div>
+      <div class="f full"><label>Comments</label><input class="up" id="f-comments"></div>
+    </div>
+    <div class="err" id="se"></div>
+    <button class="btn" id="sb" onclick="submitEntry()">Submit</button>
+  </div>
+</div>
+</div>
+<script>
+const SHEET_URL='https://script.google.com/macros/s/AKfycbyA62s67bZfq7fRoMk72rpdn2qjvmdD_ZaiAIOfWOV3o5W3s5UuJ5X0rcgpyx_YLwvowg/exec';
+const US_STATES=['','Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
+const $=id=>document.getElementById(id);
+let me=null,busy=false;
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+$('f-dl').innerHTML=US_STATES.map(s=>'<option value="'+s+'">'+(s||'Select state')+'</option>').join('');
+function msg(id,t){const e=$(id);e.textContent=t;e.style.display=t?'block':'none';}
+async function creds(){
+  const r=await fetch(SHEET_URL+'?action=getCredentials&t='+Date.now());const d=await r.json();
+  return (d.credentials||[]).map(c=>({n:String(c.candidateName).toUpperCase(),u:String(c.username).toUpperCase(),p:String(c.password)}));
+}
+async function doLogin(){
+  const u=$('lu').value.trim().toUpperCase(),p=$('lp').value;msg('le','');
+  if(!u||!p){msg('le','Enter username and password.');return;}
+  const b=$('lb');b.disabled=true;b.textContent='Checking...';
+  try{
+    const c=(await creds()).find(x=>x.u===u&&x.p===p);
+    if(!c){msg('le','Invalid username or password.');return;}
+    me={u:c.u,n:c.n};localStorage.setItem('sub_user',c.u);show();
+  }catch(e){msg('le','Connection error. Try again.');}
+  finally{b.disabled=false;b.textContent='Login';}
+}
+function show(){$('login').style.display='none';$('app').style.display='block';$('who').textContent=me.n;$('f-candidate').value=me.n;$('f-date').value=today();}
+function logout(){me=null;localStorage.removeItem('sub_user');$('app').style.display='none';$('login').style.display='block';$('lu').value='';$('lp').value='';}
+async function submitEntry(){
+  if(busy||!me)return;msg('se','');$('ok').style.display='none';
+  const g=id=>$(id).value.trim();
+  if(!g('f-client')&&!g('f-vendor')){msg('se','At least Client or Vendor Name is required.');return;}
+  const e={action:'add',id:String(Date.now()),candidate:me.n,date:g('f-date')||today(),vendor:g('f-vendor'),phone:g('f-phone'),vendorEmail:g('f-vendor-email'),vendorCompany:g('f-vendor-company'),implPartner:g('f-impl-partner'),client:g('f-client'),position:g('f-position'),location:g('f-location'),dl:$('f-dl').value,india:g('f-india'),mylocation:g('f-mylocation'),update:$('f-update').value,comments:g('f-comments')};
+  busy=true;const b=$('sb');b.disabled=true;b.textContent='Submitting...';
+  try{
+    const r=await fetch(SHEET_URL,{method:'POST',body:JSON.stringify(e)});const d=await r.json();
+    if(d.status!=='ok')throw 0;
+    ['f-vendor','f-phone','f-vendor-email','f-vendor-company','f-impl-partner','f-client','f-position','f-location','f-india','f-mylocation','f-comments'].forEach(i=>$(i).value='');
+    $('f-update').value='';$('f-dl').value='';$('f-date').value=today();
+    $('ok').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+  }catch(x){msg('se','Could not submit. Please try again.');}
+  finally{busy=false;b.disabled=false;b.textContent='Submit';}
+}
+(async function(){
+  const u=localStorage.getItem('sub_user');if(!u)return;
+  try{const c=(await creds()).find(x=>x.u===u);if(c){me={u:c.u,n:c.n};show();}}catch(e){}
+})();
+</script></body></html>
